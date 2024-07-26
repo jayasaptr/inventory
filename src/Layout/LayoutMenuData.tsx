@@ -85,7 +85,7 @@ const menuData: any = [
     id: "Barang Masuk",
     label: "Barang Masuk",
     icon: <PackagePlus />,
-    link: "/barangmasuk",
+    link: "/barang-masuk",
   },
   {
     id: "Barang Keluar",
