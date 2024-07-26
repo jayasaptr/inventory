@@ -136,7 +136,6 @@ const Layout = ({ children }: any) => {
 
   if (user == null) {
     console.log("disini");
-    // jika tidak ada redirect ke login
     return <Navigate to="/login" />;
   }
 

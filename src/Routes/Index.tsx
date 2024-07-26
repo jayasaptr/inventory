@@ -1,22 +1,25 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import DataUser from "pages/DataUser/DataUser";
 import Login from "pages/Authentication/Login";
 import Ecommerce from "pages/Dashboards/Ecommerce";
 import CategoryPage from "pages/Category/CategoryPage";
 import KondisiPage from "pages/Kondisi/KondisiPage";
 import RuanganPage from "pages/Ruangan/RuanganPage";
+import BarangPage from "pages/Barang/BarangPage";
 
 const RouteIndex = () => {
   return (
     <React.Fragment>
       <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/login" Component={Login} />
         <Route path="/dashboard" Component={Ecommerce} />
         <Route path="/user" Component={DataUser} />
         <Route path="/category" Component={CategoryPage} />
         <Route path="/kondisi" Component={KondisiPage} />
         <Route path="/ruangan" Component={RuanganPage} />
+        <Route path="/barang" Component={BarangPage} />
       </Routes>
     </React.Fragment>
   );
