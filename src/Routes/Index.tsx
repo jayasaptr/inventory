@@ -20,7 +20,6 @@ const RouteIndex = () => {
         <Route path="/category" Component={CategoryPage} />
         <Route path="/kondisi" Component={KondisiPage} />
         <Route path="/ruangan" Component={RuanganPage} />
-        <Route path="/barang" Component={BarangPage} />
         <Route path="/barang-masuk" Component={BarangMasukPage} />
       </Routes>
     </React.Fragment>

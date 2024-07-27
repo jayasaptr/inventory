@@ -76,12 +76,6 @@ const menuData: any = [
     isTitle: true,
   },
   {
-    id: "Barang",
-    label: "Barang",
-    icon: <ShoppingBag />,
-    link: "/barang",
-  },
-  {
     id: "Barang Masuk",
     label: "Barang Masuk",
     icon: <PackagePlus />,

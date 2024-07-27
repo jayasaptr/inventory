@@ -2,7 +2,6 @@ import BreadCrumb from "Common/BreadCrumb";
 import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastContainer } from "react-toastify";
-import { useDispatch } from "react-redux";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 // Formik
@@ -55,21 +54,32 @@ const BarangMasukPage = () => {
 
     initialValues: {
       id: (eventData && eventData.id) || "",
-      id_kondisi: (eventData && eventData.id_kondisi) || "",
-      id_barang: (eventData && eventData.id_barang) || "",
+      nama: (eventData && eventData.nama) || "",
+      merk: (eventData && eventData.merk) || "",
+      id_category: (eventData && eventData.id_category.id) || "",
+      id_kondisi: (eventData && eventData.id_kondisi.id) || "",
       jumlah: (eventData && eventData.jumlah) || "",
+      satuan: (eventData && eventData.satuan) || "",
+      harga: (eventData && eventData.harga) || "",
       tanggal_masuk: (eventData && eventData.tanggal_masuk) || "",
+      keterangan: (eventData && eventData.keterangan) || "",
     },
     validationSchema: Yup.object({
-      id_barang: Yup.string().required("Nama Barang is required"),
-      id_kondisi: Yup.string().required("Kondisi is required"),
-      jumlah: Yup.string().required("Jumlah is required"),
-      tanggal_masuk: Yup.string().required("Tanggal Masuk is required"),
+      nama: Yup.string().required("Nama Barang harus diisi!"),
+      merk: Yup.string().required("Merk harus diisi!"),
+      id_category: Yup.string().required("Kategori harus diisi!"),
+      id_kondisi: Yup.string().required("Kondisi harus diisi!"),
+      jumlah: Yup.string().required("Jumlah harus diisi!"),
+      satuan: Yup.string().required("Satuan harus diisi!"),
+      harga: Yup.string().required("Harga harus diisi!"),
+      tanggal_masuk: Yup.string().required("Tanggal Masuk harus diisi!"),
+      keterangan: Yup.string().required("Keterangan harus diisi!"),
     }),
 
     onSubmit: (values) => {
       console.log("🚀 ~ BarangPage ~ values:", values);
       if (isEdit) {
+        handleUpdateBarangMasuk(values);
       } else {
         handlePostBarangMasuk(values);
       }
@@ -101,13 +111,18 @@ const BarangMasukPage = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Name",
-        accessorKey: "id_barang.nama",
+        header: "Nama",
+        accessorKey: "nama",
         enableColumnFilter: false,
       },
       {
         header: "Merk",
-        accessorKey: "id_barang.merk",
+        accessorKey: "merk",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Kategori",
+        accessorKey: "id_category.name",
         enableColumnFilter: false,
       },
       {
@@ -116,8 +131,18 @@ const BarangMasukPage = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Jumlah Masuk",
+        header: "Jumlah",
         accessorKey: "jumlah",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Satuan",
+        accessorKey: "satuan",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Harga Satuan",
+        accessorKey: "harga",
         enableColumnFilter: false,
       },
       {
@@ -126,11 +151,31 @@ const BarangMasukPage = () => {
         enableColumnFilter: false,
       },
       {
+        header: "Keterangan",
+        accessorKey: "keterangan",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Total Harga",
+        accessorKey: "total_harga",
+        enableColumnFilter: false,
+      },
+      {
         header: "Action",
         enableColumnFilter: false,
         enableSorting: true,
         cell: (cell: any) => (
           <div className="flex gap-3">
+            <Link
+              to="#!"
+              className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
+              onClick={() => {
+                const data = cell.row.original;
+                handleUpdateDataClick(data);
+              }}
+            >
+              <Pencil className="size-4" />
+            </Link>
             <Link
               to="#!"
               className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
@@ -171,13 +216,16 @@ const BarangMasukPage = () => {
     console.log("🚀 ~ handlePostBarang ~ data:", data);
     try {
       setIsLoading(true);
-      // upload file
       const formData = new FormData();
-      formData.append("id_barang", data.id_barang);
+      formData.append("nama", data.nama);
+      formData.append("merk", data.merk);
+      formData.append("id_category", data.id_category);
       formData.append("id_kondisi", data.id_kondisi);
       formData.append("jumlah", data.jumlah);
-      //   ambil value yyyy-mm-dd
+      formData.append("satuan", data.satuan);
+      formData.append("harga", data.harga);
       formData.append("tanggal_masuk", data.tanggal_masuk);
+      formData.append("keterangan", data.keterangan);
 
       const userResponse = await axiosInstance.post(
         "/api/barang-masuk",
@@ -198,6 +246,45 @@ const BarangMasukPage = () => {
       }
     } catch (error) {
       console.log("🚀 ~ handlePostDataUser ~ errorss:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateBarangMasuk = async (data: any) => {
+    console.log("🚀 ~ handleUpdateBarang ~ data:", data);
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("nama", data.nama);
+      formData.append("merk", data.merk);
+      formData.append("id_category", data.id_category);
+      formData.append("id_kondisi", data.id_kondisi);
+      formData.append("jumlah", data.jumlah);
+      formData.append("satuan", data.satuan);
+      formData.append("harga", data.harga);
+      formData.append("tanggal_masuk", data.tanggal_masuk);
+      formData.append("keterangan", data.keterangan);
+
+      const userResponse = await axiosInstance.post(
+        `/api/barang-masuk/${data.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("🚀 ~ handleUpdateBarang ~ userResponse:", userResponse);
+
+      if (userResponse.data.success === true) {
+        fetchDataBarangMasuk();
+        toggle();
+      }
+    } catch (error) {
+      console.log("🚀 ~ handleUpdateBarang ~ error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -242,16 +329,15 @@ const BarangMasukPage = () => {
     }
   };
 
-  const [barang, setBarang] = useState<any>([]);
-
-  const fetchDataBarang = async () => {
+  const [category, setCategory] = useState<any>([]);
+  const fetchDataCategory = async () => {
     try {
-      const response = await axiosInstance.get("/api/barang", {
+      const response = await axiosInstance.get("/api/category", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      setBarang(response.data.data.data);
+      setCategory(response.data.data.data);
     } catch (error) {
       console.log("🚀 ~ fetchDataCategory= ~ error:", error);
     }
@@ -260,7 +346,7 @@ const BarangMasukPage = () => {
   useEffect(() => {
     fetchDataBarangMasuk();
     fetchDataKondisi();
-    fetchDataBarang();
+    fetchDataCategory();
   }, []);
 
   return (
@@ -283,7 +369,7 @@ const BarangMasukPage = () => {
         <div className="card-body">
           <div className="flex items-center gap-3 mb-4">
             <h6 className="text-15 grow">
-              Kondisi (<b className="total-Employs">{data.length}</b>)
+              Barang (<b className="total-Employs">{data.length}</b>)
             </h6>
             <div className="shrink-0">
               <Link
@@ -302,6 +388,7 @@ const BarangMasukPage = () => {
             // for no get from 1 index
             (data.map((item: any, index: number) => {
               item.no = index + 1;
+              item.total_harga = item.jumlah * item.harga;
               return item;
             }),
             (
@@ -369,39 +456,83 @@ const BarangMasukPage = () => {
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="id_barang"
+                  htmlFor="nama_barang"
                   className="inline-block mb-2 text-base font-medium"
                 >
                   Nama Barang
                 </label>
-                <select
-                  id="id_barang"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_barang"
-                  onChange={(e) => {
-                    validation.handleChange(e);
-                    validation.setFieldValue("id_barang", e.target.value);
-                  }}
-                  onBlur={validation.handleBlur}
-                  value={
-                    validation.values.id_barang ||
-                    (eventData && eventData.id_barang.id)
-                  }
+                <input
+                  type="text"
+                  id="nama_barang"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Nama Barang"
+                  name="nama"
+                  onChange={validation.handleChange}
+                  value={validation.values.nama || ""}
+                />
+                {validation.touched.nama && validation.errors.nama ? (
+                  <p className="text-red-400">{validation.errors.nama}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="merk"
+                  className="inline-block mb-2 text-base font-medium"
                 >
-                  {/* <option value="">Pilih Barang</option> */}
-                  {barang.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
-                    </option>
-                  ))}
-                </select>
-                {validation.touched.id_barang && validation.errors.id_barang ? (
-                  <p className="text-red-400">{validation.errors.id_barang}</p>
+                  Merk
+                </label>
+                <input
+                  type="text"
+                  id="merk"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Merk"
+                  name="merk"
+                  onChange={validation.handleChange}
+                  value={validation.values.merk || ""}
+                />
+                {validation.touched.merk && validation.errors.merk ? (
+                  <p className="text-red-400">{validation.errors.merk}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
                 <label
                   htmlFor="id_category"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  Kategori
+                </label>
+                <select
+                  id="id_category"
+                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  name="id_category"
+                  onChange={(e) => {
+                    validation.handleChange(e);
+                    validation.setFieldValue("id_category", e.target.value);
+                  }}
+                  onBlur={validation.handleBlur}
+                  value={
+                    validation.values.id_category ||
+                    (eventData && eventData.id_category.id) ||
+                    ""
+                  }
+                >
+                  <option value="">Pilih Kategori</option>
+                  {category.map((item: any, index: number) => (
+                    <option key={index} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+                {validation.touched.id_category &&
+                validation.errors.id_category ? (
+                  <p className="text-red-400">
+                    {validation.errors.id_category}
+                  </p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="id_kondisi"
                   className="inline-block mb-2 text-base font-medium"
                 >
                   Kondisi
@@ -455,6 +586,46 @@ const BarangMasukPage = () => {
               </div>
               <div className="xl:col-span-12">
                 <label
+                  htmlFor="satuan"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Satuan
+                </label>
+                <input
+                  type="text"
+                  id="satuan"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Satuan"
+                  name="satuan"
+                  onChange={validation.handleChange}
+                  value={validation.values.satuan || ""}
+                />
+                {validation.touched.satuan && validation.errors.satuan ? (
+                  <p className="text-red-400">{validation.errors.satuan}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="harga"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Harga
+                </label>
+                <input
+                  type="number"
+                  id="harga"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Harga"
+                  name="harga"
+                  onChange={validation.handleChange}
+                  value={validation.values.harga || ""}
+                />
+                {validation.touched.harga && validation.errors.harga ? (
+                  <p className="text-red-400">{validation.errors.harga}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
                   htmlFor="tanggal_masuk"
                   className="inline-block mb-2 text-balance font-medium"
                 >
@@ -474,6 +645,27 @@ const BarangMasukPage = () => {
                   <p className="text-red-400">
                     {validation.errors.tanggal_masuk}
                   </p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="keterangan"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Keterangan
+                </label>
+                <input
+                  type="text"
+                  id="keterangan"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Keterangan"
+                  name="keterangan"
+                  onChange={validation.handleChange}
+                  value={validation.values.keterangan || ""}
+                />
+                {validation.touched.keterangan &&
+                validation.errors.keterangan ? (
+                  <p className="text-red-400">{validation.errors.keterangan}</p>
                 ) : null}
               </div>
             </div>
