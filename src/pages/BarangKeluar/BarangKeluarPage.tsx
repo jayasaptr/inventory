@@ -12,9 +12,10 @@ import Modal from "Common/Components/Modal";
 import { axiosInstance } from "lib/axios";
 import Layout from "Layout";
 
-const BarangMasukPage = () => {
+const BarangKeluarPage = () => {
   const [data, setData] = useState<any>([]);
   const [eventData, setEventData] = useState<any>();
+  const [id, setId] = useState<number>(0);
 
   const [show, setShow] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -25,16 +26,15 @@ const BarangMasukPage = () => {
   const deleteToggle = () => setDeleteModal(!deleteModal);
 
   // Delete Data
-  const onClickDelete = (cell: any) => {
+  const onClickDelete = (cell: number) => {
     setDeleteModal(true);
-    if (cell.id) {
-      setEventData(cell);
-    }
+    setId(cell);
   };
 
   const handleDelete = () => {
-    if (eventData) {
-      handleDeleteDataBarangMasuk(eventData.id);
+    console.log("🚀 ~ handleDelete ~ eventData:", id);
+    if (id) {
+      handleDeleteDataBarangMasuk(id);
       setDeleteModal(false);
     }
   };
@@ -53,27 +53,21 @@ const BarangMasukPage = () => {
     enableReinitialize: true,
 
     initialValues: {
-      id: (eventData && eventData.id) || "",
-      nama: (eventData && eventData.nama) || "",
-      merk: (eventData && eventData.merk) || "",
-      id_category: (eventData && eventData.id_category.id) || "",
+      // id: (eventData && eventData.id) || "",
+      id_barang: (eventData && eventData.id_barang.id) || "",
       id_kondisi: (eventData && eventData.id_kondisi.id) || "",
       jumlah: (eventData && eventData.jumlah) || "",
-      satuan: (eventData && eventData.satuan) || "",
-      harga: (eventData && eventData.harga) || "",
-      tanggal_masuk: (eventData && eventData.tanggal_masuk) || "",
+      penerima: (eventData && eventData.penerima) || "",
+      tanggal_keluar: (eventData && eventData.tanggal_keluar) || "",
       keterangan: (eventData && eventData.keterangan) || "",
     },
     validationSchema: Yup.object({
-      nama: Yup.string().required("Nama Barang harus diisi!"),
-      merk: Yup.string().required("Merk harus diisi!"),
-      id_category: Yup.string().required("Kategori harus diisi!"),
-      id_kondisi: Yup.string().required("Kondisi harus diisi!"),
-      jumlah: Yup.string().required("Jumlah harus diisi!"),
-      satuan: Yup.string().required("Satuan harus diisi!"),
-      harga: Yup.string().required("Harga harus diisi!"),
-      tanggal_masuk: Yup.string().required("Tanggal Masuk harus diisi!"),
-      keterangan: Yup.string().required("Keterangan harus diisi!"),
+      id_barang: Yup.string().required("Pilih Barang"),
+      id_kondisi: Yup.string().required("Pilih Kondisi"),
+      jumlah: Yup.string().required("Jumlah harus diisi"),
+      penerima: Yup.string().required("Penerima harus diisi"),
+      tanggal_keluar: Yup.string().required("Tanggal Keluar harus diisi"),
+      keterangan: Yup.string().required("Keterangan harus diisi"),
     }),
 
     onSubmit: (values) => {
@@ -81,7 +75,7 @@ const BarangMasukPage = () => {
       if (isEdit) {
         handleUpdateBarangMasuk(values);
       } else {
-        handlePostBarangMasuk(values);
+        handlePostBarangKeluar(values);
       }
       if (isLoading) {
         toggle();
@@ -112,17 +106,17 @@ const BarangMasukPage = () => {
       },
       {
         header: "Nama",
-        accessorKey: "nama",
+        accessorKey: "id_barang_masuk.nama",
         enableColumnFilter: false,
       },
       {
         header: "Merk",
-        accessorKey: "merk",
+        accessorKey: "id_barang_masuk.merk",
         enableColumnFilter: false,
       },
       {
         header: "Kategori",
-        accessorKey: "id_category.name",
+        accessorKey: "id_barang_masuk.id_category.name",
         enableColumnFilter: false,
       },
       {
@@ -131,38 +125,28 @@ const BarangMasukPage = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Jumlah Masuk",
+        header: "Jumlah Keluar",
         accessorKey: "jumlah",
         enableColumnFilter: false,
       },
       {
-        header: "Stock Tersedia",
-        accessorKey: "stock",
-        enableColumnFilter: false,
-      },
-      {
         header: "Satuan",
-        accessorKey: "satuan",
+        accessorKey: "id_barang_masuk.satuan",
         enableColumnFilter: false,
       },
       {
-        header: "Harga Satuan",
-        accessorKey: "harga",
+        header: "Tanggal Keluar",
+        accessorKey: "tanggal_keluar",
         enableColumnFilter: false,
       },
       {
-        header: "Tanggal Masuk",
-        accessorKey: "tanggal_masuk",
+        header: "Penerima",
+        accessorKey: "penerima",
         enableColumnFilter: false,
       },
       {
         header: "Keterangan",
         accessorKey: "keterangan",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Total Harga",
-        accessorKey: "total_harga",
         enableColumnFilter: false,
       },
       {
@@ -173,20 +157,10 @@ const BarangMasukPage = () => {
           <div className="flex gap-3">
             <Link
               to="#!"
-              className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
-              onClick={() => {
-                const data = cell.row.original;
-                handleUpdateDataClick(data);
-              }}
-            >
-              <Pencil className="size-4" />
-            </Link>
-            <Link
-              to="#!"
               className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
               onClick={() => {
                 const data = cell.row.original;
-                onClickDelete(data);
+                onClickDelete(data.id);
               }}
             >
               <Trash2 className="size-4" />
@@ -200,9 +174,9 @@ const BarangMasukPage = () => {
 
   const user = JSON.parse(localStorage.getItem("authUser")!);
 
-  const fetchDataBarangMasuk = async () => {
+  const fetchDataBarangKeluar = async () => {
     try {
-      const userResponse = await axiosInstance.get("/api/barang-masuk", {
+      const userResponse = await axiosInstance.get("/api/barang-keluar", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -217,23 +191,20 @@ const BarangMasukPage = () => {
     }
   };
 
-  const handlePostBarangMasuk = async (data: any) => {
+  const handlePostBarangKeluar = async (data: any) => {
     console.log("🚀 ~ handlePostBarang ~ data:", data);
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("nama", data.nama);
-      formData.append("merk", data.merk);
-      formData.append("id_category", data.id_category);
+      formData.append("id_barang_masuk", data.id_barang);
       formData.append("id_kondisi", data.id_kondisi);
       formData.append("jumlah", data.jumlah);
-      formData.append("satuan", data.satuan);
-      formData.append("harga", data.harga);
-      formData.append("tanggal_masuk", data.tanggal_masuk);
+      formData.append("penerima", data.penerima);
+      formData.append("tanggal_keluar", data.tanggal_keluar);
       formData.append("keterangan", data.keterangan);
 
       const userResponse = await axiosInstance.post(
-        "/api/barang-masuk",
+        "/api/barang-keluar",
         formData,
         {
           headers: {
@@ -246,7 +217,7 @@ const BarangMasukPage = () => {
       console.log("🚀 ~ handlePostDataUser ~ userResponse:", userResponse);
 
       if (userResponse.data.success === true) {
-        fetchDataBarangMasuk();
+        fetchDataBarangKeluar();
         toggle();
       }
     } catch (error) {
@@ -285,7 +256,7 @@ const BarangMasukPage = () => {
       console.log("🚀 ~ handleUpdateBarang ~ userResponse:", userResponse);
 
       if (userResponse.data.success === true) {
-        fetchDataBarangMasuk();
+        fetchDataBarangKeluar();
         toggle();
       }
     } catch (error) {
@@ -299,7 +270,7 @@ const BarangMasukPage = () => {
     try {
       setIsLoading(true);
       const userResponse = await axiosInstance.delete(
-        `/api/barang-masuk/${id}`,
+        `/api/barang-keluar/${id}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -310,7 +281,7 @@ const BarangMasukPage = () => {
       console.log("🚀 ~ handleDeleteDataUser ~ userResponse:", userResponse);
 
       if (userResponse.data.success === true) {
-        fetchDataBarangMasuk();
+        fetchDataBarangKeluar();
       }
     } catch (error) {
       console.log("🚀 ~ handleDeleteDataUser ~ error:", error);
@@ -334,24 +305,25 @@ const BarangMasukPage = () => {
     }
   };
 
-  const [category, setCategory] = useState<any>([]);
-  const fetchDataCategory = async () => {
+  const [barang, setBarang] = useState<any>([]);
+
+  const fetchDataBarang = async () => {
     try {
-      const response = await axiosInstance.get("/api/category", {
+      const response = await axiosInstance.get("/api/barang-masuk", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      setCategory(response.data.data.data);
+      setBarang(response.data.data.data);
     } catch (error) {
       console.log("🚀 ~ fetchDataCategory= ~ error:", error);
     }
   };
 
   useEffect(() => {
-    fetchDataBarangMasuk();
+    fetchDataBarangKeluar();
     fetchDataKondisi();
-    fetchDataCategory();
+    fetchDataBarang();
   }, []);
 
   return (
@@ -385,7 +357,7 @@ const BarangMasukPage = () => {
                 onClick={toggle}
               >
                 <Plus className="inline-block size-4" />{" "}
-                <span className="align-middle">Add Barang Masuk</span>
+                <span className="align-middle">Add Barang Keluar</span>
               </Link>
             </div>
           </div>
@@ -461,78 +433,35 @@ const BarangMasukPage = () => {
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="nama_barang"
+                  htmlFor="id_barang"
                   className="inline-block mb-2 text-base font-medium"
                 >
-                  Nama Barang
-                </label>
-                <input
-                  type="text"
-                  id="nama_barang"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Nama Barang"
-                  name="nama"
-                  onChange={validation.handleChange}
-                  value={validation.values.nama || ""}
-                />
-                {validation.touched.nama && validation.errors.nama ? (
-                  <p className="text-red-400">{validation.errors.nama}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="merk"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Merk
-                </label>
-                <input
-                  type="text"
-                  id="merk"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Merk"
-                  name="merk"
-                  onChange={validation.handleChange}
-                  value={validation.values.merk || ""}
-                />
-                {validation.touched.merk && validation.errors.merk ? (
-                  <p className="text-red-400">{validation.errors.merk}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="id_category"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Kategori
+                  Pilih Barang
                 </label>
                 <select
-                  id="id_category"
+                  id="id_barang"
                   className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_category"
+                  name="id_barang"
                   onChange={(e) => {
                     validation.handleChange(e);
-                    validation.setFieldValue("id_category", e.target.value);
+                    validation.setFieldValue("id_barang", e.target.value);
                   }}
                   onBlur={validation.handleBlur}
                   value={
-                    validation.values.id_category ||
-                    (eventData && eventData.id_category.id) ||
+                    validation.values.id_barang ||
+                    (eventData && eventData.id_barang.id) ||
                     ""
                   }
                 >
-                  <option value="">Pilih Kategori</option>
-                  {category.map((item: any, index: number) => (
+                  <option value="">Pilih Barang</option>
+                  {barang.map((item: any, index: number) => (
                     <option key={index} value={item.id}>
-                      {item.name}
+                      {item.nama}
                     </option>
                   ))}
                 </select>
-                {validation.touched.id_category &&
-                validation.errors.id_category ? (
-                  <p className="text-red-400">
-                    {validation.errors.id_category}
-                  </p>
+                {validation.touched.id_barang && validation.errors.id_barang ? (
+                  <p className="text-red-400">{validation.errors.id_barang}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
@@ -591,64 +520,44 @@ const BarangMasukPage = () => {
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="satuan"
+                  htmlFor="penerima"
                   className="inline-block mb-2 text-balance font-medium"
                 >
-                  Satuan
+                  Penerima
                 </label>
                 <input
                   type="text"
-                  id="satuan"
+                  id="penerima"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Satuan"
-                  name="satuan"
+                  placeholder="Penerima"
+                  name="penerima"
                   onChange={validation.handleChange}
-                  value={validation.values.satuan || ""}
+                  value={validation.values.penerima || ""}
                 />
-                {validation.touched.satuan && validation.errors.satuan ? (
-                  <p className="text-red-400">{validation.errors.satuan}</p>
+                {validation.touched.penerima && validation.errors.penerima ? (
+                  <p className="text-red-400">{validation.errors.penerima}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="harga"
+                  htmlFor="tanggal_keluar"
                   className="inline-block mb-2 text-balance font-medium"
                 >
-                  Harga
-                </label>
-                <input
-                  type="number"
-                  id="harga"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Harga"
-                  name="harga"
-                  onChange={validation.handleChange}
-                  value={validation.values.harga || ""}
-                />
-                {validation.touched.harga && validation.errors.harga ? (
-                  <p className="text-red-400">{validation.errors.harga}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="tanggal_masuk"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Tanggal Masuk
+                  Tanggal Keluar
                 </label>
                 <input
                   type="date"
-                  id="tanggal_masuk"
+                  id="tanggal_keluar"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Tanggal Masuk"
-                  name="tanggal_masuk"
+                  placeholder="Tanggal Keluar"
+                  name="tanggal_keluar"
                   onChange={validation.handleChange}
-                  value={validation.values.tanggal_masuk || ""}
+                  value={validation.values.tanggal_keluar || ""}
                 />
-                {validation.touched.tanggal_masuk &&
-                validation.errors.tanggal_masuk ? (
+                {validation.touched.tanggal_keluar &&
+                validation.errors.tanggal_keluar ? (
                   <p className="text-red-400">
-                    {validation.errors.tanggal_masuk}
+                    {validation.errors.tanggal_keluar}
                   </p>
                 ) : null}
               </div>
@@ -694,7 +603,7 @@ const BarangMasukPage = () => {
                   ? "Loading"
                   : !!isEdit
                   ? "Update"
-                  : "Add Barang Masuk"}
+                  : "Add Barang Keluar"}
               </button>
             </div>
           </form>
@@ -704,4 +613,4 @@ const BarangMasukPage = () => {
   );
 };
 
-export default BarangMasukPage;
+export default BarangKeluarPage;

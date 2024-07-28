@@ -85,7 +85,7 @@ const menuData: any = [
     id: "Barang Keluar",
     label: "Barang Keluar",
     icon: <PackagePlus />,
-    link: "/barangkeluar",
+    link: "/barang-keluar",
   },
   {
     label: "Data Lainnya",
