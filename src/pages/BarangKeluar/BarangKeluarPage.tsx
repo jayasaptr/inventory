@@ -3,7 +3,7 @@ import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // Formik
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -73,7 +73,6 @@ const BarangKeluarPage = () => {
     onSubmit: (values) => {
       console.log("🚀 ~ BarangPage ~ values:", values);
       if (isEdit) {
-        handleUpdateBarangMasuk(values);
       } else {
         handlePostBarangKeluar(values);
       }
@@ -174,6 +173,8 @@ const BarangKeluarPage = () => {
 
   const user = JSON.parse(localStorage.getItem("authUser")!);
 
+  const naviagate = useNavigate();
+
   const fetchDataBarangKeluar = async () => {
     try {
       const userResponse = await axiosInstance.get("/api/barang-keluar", {
@@ -186,8 +187,11 @@ const BarangKeluarPage = () => {
         userResponse.data.data.data
       );
       setData(userResponse.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 
@@ -220,47 +224,11 @@ const BarangKeluarPage = () => {
         fetchDataBarangKeluar();
         toggle();
       }
-    } catch (error) {
-      console.log("🚀 ~ handlePostDataUser ~ errorss:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleUpdateBarangMasuk = async (data: any) => {
-    console.log("🚀 ~ handleUpdateBarang ~ data:", data);
-    try {
-      setIsLoading(true);
-      const formData = new FormData();
-      formData.append("nama", data.nama);
-      formData.append("merk", data.merk);
-      formData.append("id_category", data.id_category);
-      formData.append("id_kondisi", data.id_kondisi);
-      formData.append("jumlah", data.jumlah);
-      formData.append("satuan", data.satuan);
-      formData.append("harga", data.harga);
-      formData.append("tanggal_masuk", data.tanggal_masuk);
-      formData.append("keterangan", data.keterangan);
-
-      const userResponse = await axiosInstance.post(
-        `/api/barang-masuk/${data.id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("🚀 ~ handleUpdateBarang ~ userResponse:", userResponse);
-
-      if (userResponse.data.success === true) {
-        fetchDataBarangKeluar();
-        toggle();
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
       }
-    } catch (error) {
-      console.log("🚀 ~ handleUpdateBarang ~ error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -278,13 +246,14 @@ const BarangKeluarPage = () => {
         }
       );
 
-      console.log("🚀 ~ handleDeleteDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataBarangKeluar();
       }
-    } catch (error) {
-      console.log("🚀 ~ handleDeleteDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -300,8 +269,11 @@ const BarangKeluarPage = () => {
         },
       });
       setKondisi(response.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataCategory= ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 
@@ -315,8 +287,11 @@ const BarangKeluarPage = () => {
         },
       });
       setBarang(response.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataCategory= ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 

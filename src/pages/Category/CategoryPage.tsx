@@ -3,7 +3,7 @@ import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // Formik
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -152,6 +152,8 @@ const CategoryPage = () => {
 
   const user = JSON.parse(localStorage.getItem("authUser")!);
 
+  const naviagate = useNavigate();
+
   const fetchDataUser = async () => {
     try {
       const userResponse = await axiosInstance.get("/api/category", {
@@ -164,8 +166,11 @@ const CategoryPage = () => {
         userResponse.data.data.data
       );
       setData(userResponse.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 
@@ -183,14 +188,15 @@ const CategoryPage = () => {
         },
       });
 
-      console.log("🚀 ~ handlePostDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataUser();
         toggle();
       }
-    } catch (error) {
-      console.log("🚀 ~ handlePostDataUser ~ errorss:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -214,14 +220,15 @@ const CategoryPage = () => {
         }
       );
 
-      console.log("🚀 ~ handleUpdateDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataUser();
         toggle();
       }
-    } catch (error) {
-      console.log("🚀 ~ handleUpdateDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -236,13 +243,14 @@ const CategoryPage = () => {
         },
       });
 
-      console.log("🚀 ~ handleDeleteDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataUser();
       }
-    } catch (error) {
-      console.log("🚀 ~ handleDeleteDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }

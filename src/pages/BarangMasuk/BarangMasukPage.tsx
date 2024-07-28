@@ -3,7 +3,7 @@ import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // Formik
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -200,6 +200,8 @@ const BarangMasukPage = () => {
 
   const user = JSON.parse(localStorage.getItem("authUser")!);
 
+  const naviagate = useNavigate();
+
   const fetchDataBarangMasuk = async () => {
     try {
       const userResponse = await axiosInstance.get("/api/barang-masuk", {
@@ -212,8 +214,11 @@ const BarangMasukPage = () => {
         userResponse.data.data.data
       );
       setData(userResponse.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 
@@ -243,14 +248,15 @@ const BarangMasukPage = () => {
         }
       );
 
-      console.log("🚀 ~ handlePostDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataBarangMasuk();
         toggle();
       }
-    } catch (error) {
-      console.log("🚀 ~ handlePostDataUser ~ errorss:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -282,14 +288,15 @@ const BarangMasukPage = () => {
         }
       );
 
-      console.log("🚀 ~ handleUpdateBarang ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataBarangMasuk();
         toggle();
       }
-    } catch (error) {
-      console.log("🚀 ~ handleUpdateBarang ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -307,13 +314,14 @@ const BarangMasukPage = () => {
         }
       );
 
-      console.log("🚀 ~ handleDeleteDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataBarangMasuk();
       }
-    } catch (error) {
-      console.log("🚀 ~ handleDeleteDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -329,8 +337,11 @@ const BarangMasukPage = () => {
         },
       });
       setKondisi(response.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataCategory= ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 
@@ -343,8 +354,11 @@ const BarangMasukPage = () => {
         },
       });
       setCategory(response.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataCategory= ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 

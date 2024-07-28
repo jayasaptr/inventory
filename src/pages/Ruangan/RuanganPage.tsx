@@ -3,7 +3,7 @@ import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // Formik
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -159,6 +159,8 @@ const RuanganPage = () => {
 
   const user = JSON.parse(localStorage.getItem("authUser")!);
 
+  const naviagate = useNavigate();
+
   const fetchDataRuangan = async () => {
     try {
       const userResponse = await axiosInstance.get("/api/ruangan", {
@@ -171,8 +173,11 @@ const RuanganPage = () => {
         userResponse.data.data.data
       );
       setData(userResponse.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataRuangan ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 
@@ -190,14 +195,15 @@ const RuanganPage = () => {
         },
       });
 
-      console.log("🚀 ~ handlePostDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataRuangan();
         toggle();
       }
-    } catch (error) {
-      console.log("🚀 ~ handlePostDataUser ~ errorss:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -221,14 +227,15 @@ const RuanganPage = () => {
         }
       );
 
-      console.log("🚀 ~ handleUpdateDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataRuangan();
         toggle();
       }
-    } catch (error) {
-      console.log("🚀 ~ handleUpdateDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -243,13 +250,14 @@ const RuanganPage = () => {
         },
       });
 
-      console.log("🚀 ~ handleDeleteDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
         fetchDataRuangan();
       }
-    } catch (error) {
-      console.log("🚀 ~ handleDeleteDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -280,8 +288,11 @@ const RuanganPage = () => {
         setPage(page + 1);
         setHasMore(true);
       }
-    } catch (error) {
-      console.log("🚀 ~ fetchDataUser ~ error:", error);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 
