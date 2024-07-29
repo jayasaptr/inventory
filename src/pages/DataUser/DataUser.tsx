@@ -77,7 +77,6 @@ const DataUser = () => {
       foto: (eventData && eventData.foto) || "",
       role: (eventData && eventData.role) || "",
       email: (eventData && eventData.email) || "",
-      password: (eventData && eventData.password) || "",
       no_telp: (eventData && eventData.no_telp) || "",
       alamat: (eventData && eventData.alamat) || "",
     },
@@ -87,7 +86,6 @@ const DataUser = () => {
       email: Yup.string()
         .email("Invalid email format")
         .required("Email is required"),
-      password: Yup.string().required("Password is required"),
       no_telp: Yup.string().required("Phone number is required"),
       alamat: Yup.string().required("Location is required"),
       role: Yup.string().required("Role is required"),
@@ -261,7 +259,6 @@ const DataUser = () => {
       formData.append("name", data.name);
       formData.append("nip", data.nip);
       formData.append("email", data.email);
-      formData.append("password", data.password);
       formData.append("no_telp", data.no_telp);
       formData.append("alamat", data.alamat);
       formData.append("role", data.role);
