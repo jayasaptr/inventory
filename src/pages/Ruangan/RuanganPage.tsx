@@ -1,7 +1,7 @@
 import BreadCrumb from "Common/BreadCrumb";
 import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, ToastPosition, toast } from "react-toastify";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 // Formik
@@ -162,22 +162,22 @@ const RuanganPage = () => {
   const naviagate = useNavigate();
 
   const fetchDataRuangan = async () => {
+    setLoadingV(true);
     try {
       const userResponse = await axiosInstance.get("/api/ruangan", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      console.log(
-        "🚀 ~ fetchDataRuangan ~ userResponse:",
-        userResponse.data.data.data
-      );
       setData(userResponse.data.data.data);
     } catch (error: any) {
+      Error("Data Ruangan gagal diambil");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
       }
+    } finally {
+      setLoadingV(false);
     }
   };
 
@@ -196,10 +196,12 @@ const RuanganPage = () => {
       });
 
       if (userResponse.data.success === true) {
+        Success("Data Ruangan berhasil ditambahkan");
         fetchDataRuangan();
         toggle();
       }
     } catch (error: any) {
+      Error("Data Ruangan gagal ditambahkan");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -228,10 +230,12 @@ const RuanganPage = () => {
       );
 
       if (userResponse.data.success === true) {
+        Success("Data Ruangan berhasil diupdate");
         fetchDataRuangan();
         toggle();
       }
     } catch (error: any) {
+      Error("Data Ruangan gagal diupdate");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -251,9 +255,11 @@ const RuanganPage = () => {
       });
 
       if (userResponse.data.success === true) {
+        Success("Data Ruangan berhasil dihapus");
         fetchDataRuangan();
       }
     } catch (error: any) {
+      Error("Data Ruangan gagal dihapus");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -304,6 +310,32 @@ const RuanganPage = () => {
     fetchDataRuangan();
     fetchDataUser();
   }, []);
+
+  const [loadingV, setLoadingV] = useState(false);
+
+  const loadingView = (
+    <div className="flex flex-wrap items-center gap-5 px-3 py-2 justify-center">
+      <div className="inline-block size-8 border-2 border-green-500 rounded-full animate-spin border-l-transparent"></div>
+    </div>
+  );
+
+  const Success = (title: string) =>
+    toast.success(title, {
+      autoClose: 3000,
+      theme: "colored",
+      icon: false,
+      position: toast.POSITION.TOP_RIGHT,
+      closeButton: false,
+    });
+
+  const Error = (title: string) =>
+    toast.error(title, {
+      autoClose: 3000,
+      theme: "colored",
+      icon: false,
+      position: toast.POSITION.TOP_RIGHT,
+      closeButton: false,
+    });
 
   return (
     <Layout>
@@ -360,6 +392,8 @@ const RuanganPage = () => {
                 PaginationClassName="flex flex-col items-center gap-4 px-4 mt-4 md:flex-row"
               />
             ))
+          ) : loadingV ? (
+            loadingView
           ) : (
             <div className="noresult">
               <div className="py-6 text-center">

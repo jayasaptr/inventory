@@ -1,7 +1,7 @@
 import BreadCrumb from "Common/BreadCrumb";
 import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, ToastPosition, toast } from "react-toastify";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 // Formik
@@ -176,6 +176,7 @@ const BarangKeluarPage = () => {
   const naviagate = useNavigate();
 
   const fetchDataBarangKeluar = async () => {
+    setLoadingV(true);
     try {
       const userResponse = await axiosInstance.get("/api/barang-keluar", {
         headers: {
@@ -192,11 +193,12 @@ const BarangKeluarPage = () => {
         localStorage.removeItem("authUser");
         naviagate("/login");
       }
+    } finally {
+      setLoadingV(false);
     }
   };
 
   const handlePostBarangKeluar = async (data: any) => {
-    console.log("🚀 ~ handlePostBarang ~ data:", data);
     try {
       setIsLoading(true);
       const formData = new FormData();
@@ -218,13 +220,13 @@ const BarangKeluarPage = () => {
         }
       );
 
-      console.log("🚀 ~ handlePostDataUser ~ userResponse:", userResponse);
-
       if (userResponse.data.success === true) {
+        Success("Data Barang Keluar Berhasil Ditambahkan");
         fetchDataBarangKeluar();
         toggle();
       }
     } catch (error: any) {
+      Error("Data Barang Keluar Gagal Ditambahkan");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -247,9 +249,11 @@ const BarangKeluarPage = () => {
       );
 
       if (userResponse.data.success === true) {
+        Success("Data Barang Keluar Berhasil Dihapus");
         fetchDataBarangKeluar();
       }
     } catch (error: any) {
+      Error("Data Barang Keluar Gagal Dihapus");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -300,6 +304,32 @@ const BarangKeluarPage = () => {
     fetchDataKondisi();
     fetchDataBarang();
   }, []);
+
+  const [loadingV, setLoadingV] = useState(false);
+
+  const loadingView = (
+    <div className="flex flex-wrap items-center gap-5 px-3 py-2 justify-center">
+      <div className="inline-block size-8 border-2 border-green-500 rounded-full animate-spin border-l-transparent"></div>
+    </div>
+  );
+
+  const Success = (title: string) =>
+    toast.success(title, {
+      autoClose: 3000,
+      theme: "colored",
+      icon: false,
+      position: toast.POSITION.TOP_RIGHT,
+      closeButton: false,
+    });
+
+  const Error = (title: string) =>
+    toast.error(title, {
+      autoClose: 3000,
+      theme: "colored",
+      icon: false,
+      position: toast.POSITION.TOP_RIGHT,
+      closeButton: false,
+    });
 
   return (
     <Layout>
@@ -357,6 +387,8 @@ const BarangKeluarPage = () => {
                 PaginationClassName="flex flex-col items-center gap-4 px-4 mt-4 md:flex-row"
               />
             ))
+          ) : loadingV ? (
+            loadingView
           ) : (
             <div className="noresult">
               <div className="py-6 text-center">

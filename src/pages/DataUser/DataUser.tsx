@@ -1,7 +1,7 @@
 import BreadCrumb from "Common/BreadCrumb";
 import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, ToastPosition, toast } from "react-toastify";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 // Formik
@@ -24,6 +24,25 @@ const DataUser = () => {
 
   // Image
   const [selectedImage, setSelectedImage] = useState<any>();
+
+  // toast
+  const Success = (title: string) =>
+    toast.success(title, {
+      autoClose: 3000,
+      theme: "colored",
+      icon: false,
+      position: toast.POSITION.TOP_RIGHT,
+      closeButton: false,
+    });
+
+  const Error = (title: string) =>
+    toast.error(title, {
+      autoClose: 3000,
+      theme: "colored",
+      icon: false,
+      position: toast.POSITION.TOP_RIGHT,
+      closeButton: false,
+    });
 
   const handleImageChange = (event: any) => {
     const fileInput = event.target;
@@ -196,6 +215,7 @@ const DataUser = () => {
   const user = JSON.parse(localStorage.getItem("authUser")!);
 
   const fetchDataUser = async () => {
+    setLoadingV(true);
     try {
       const userResponse = await axiosInstance.get("/api/user", {
         headers: {
@@ -208,10 +228,13 @@ const DataUser = () => {
       );
       setData(userResponse.data.data.data);
     } catch (error: any) {
+      Error("Something went wrong");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
       }
+    } finally {
+      setLoadingV(false);
     }
   };
 
@@ -237,10 +260,12 @@ const DataUser = () => {
       });
 
       if (userResponse.data.success === true) {
+        Success("User Added Successfully");
         fetchDataUser();
         toggle();
       }
     } catch (error: any) {
+      Error("Something went wrong");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -275,10 +300,12 @@ const DataUser = () => {
       );
 
       if (userResponse.data.success === true) {
+        Success("User Updated Successfully");
         fetchDataUser();
         toggle();
       }
     } catch (error: any) {
+      Error("Something went wrong");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -298,6 +325,7 @@ const DataUser = () => {
       });
 
       if (userResponse.data.success === true) {
+        Success("User Deleted Successfully");
         fetchDataUser();
       }
     } catch (error: any) {
@@ -313,6 +341,14 @@ const DataUser = () => {
   useEffect(() => {
     fetchDataUser();
   }, []);
+
+  const [loadingV, setLoadingV] = useState(false);
+
+  const loadingView = (
+    <div className="flex flex-wrap items-center gap-5 px-3 py-2 justify-center">
+      <div className="inline-block size-8 border-2 border-green-500 rounded-full animate-spin border-l-transparent"></div>
+    </div>
+  );
 
   return (
     <Layout>
@@ -362,6 +398,8 @@ const DataUser = () => {
               tdclassName="px-3.5 py-2.5 first:pl-5 last:pr-5 border-y border-slate-200 dark:border-zink-500"
               PaginationClassName="flex flex-col items-center gap-4 px-4 mt-4 md:flex-row"
             />
+          ) : loadingV ? (
+            loadingView
           ) : (
             <div className="noresult">
               <div className="py-6 text-center">
