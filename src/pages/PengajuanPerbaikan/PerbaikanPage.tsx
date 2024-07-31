@@ -2,7 +2,16 @@ import BreadCrumb from "Common/BreadCrumb";
 import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastContainer, ToastPosition, toast } from "react-toastify";
-import { ImagePlus, Pencil, Plus, Search, Trash2, Check } from "lucide-react";
+import {
+  ImagePlus,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  Check,
+  BookMarked,
+  ClipboardList,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 // Formik
 import * as Yup from "yup";
@@ -25,16 +34,34 @@ const PengajuanPerbaikan = () => {
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const deleteToggle = () => setDeleteModal(!deleteModal);
 
+  // Image
+  const [selectedImage, setSelectedImage] = useState<any>();
+
+  const handleImageChange = (event: any) => {
+    const fileInput = event.target;
+    if (fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        validation.setFieldValue("kwitansi", file);
+        setSelectedImage(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Delete Data
-  const onClickDelete = (cell: number) => {
+  const onClickDelete = (cell: any) => {
     setDeleteModal(true);
-    setId(cell);
+    // setId(cell);
+    if (cell.id) {
+      setEventData(cell);
+    }
   };
 
   const handleDelete = () => {
-    console.log("🚀 ~ handleDelete ~ eventData:", id);
-    if (id) {
-      handleDeleteDataBarangMasuk(id);
+    if (eventData) {
+      handleDeleteDataBarangMasuk(eventData.id);
       setDeleteModal(false);
     }
   };
@@ -53,27 +80,30 @@ const PengajuanPerbaikan = () => {
     enableReinitialize: true,
 
     initialValues: {
-      // id: (eventData && eventData.id) || "",
-      id_barang: (eventData && eventData.id_barang.id) || "",
-      id_kondisi: (eventData && eventData.id_kondisi.id) || "",
+      id: (eventData && eventData.id) || "",
+      id_barang_masuk: (eventData && eventData.id_barang_masuk.id) || "",
       jumlah: (eventData && eventData.jumlah) || "",
-      penerima: (eventData && eventData.penerima) || "",
-      tanggal_keluar: (eventData && eventData.tanggal_keluar) || "",
+      biaya: (eventData && eventData.biaya) || "",
+      tanggal_perbaikan: (eventData && eventData.tanggal_perbaikan) || "",
+      tanggal_selesai: (eventData && eventData.tanggal_selesai) || "",
       keterangan: (eventData && eventData.keterangan) || "",
+      kwitansi: (eventData && eventData.kwitansi) || "",
     },
     validationSchema: Yup.object({
-      id_barang: Yup.string().required("Pilih Barang"),
-      id_kondisi: Yup.string().required("Pilih Kondisi"),
-      jumlah: Yup.string().required("Jumlah harus diisi"),
-      penerima: Yup.string().required("Penerima harus diisi"),
-      tanggal_keluar: Yup.string().required("Tanggal Keluar harus diisi"),
-      keterangan: Yup.string().required("Keterangan harus diisi"),
+      id_barang_masuk: Yup.string().required("Pilih Barang"),
+      jumlah: Yup.number().required("Jumlah Harus Diisi"),
+      biaya: Yup.number().required("Biaya Harus Diisi"),
+      tanggal_perbaikan: Yup.string().required("Tanggal Perbaikan Harus Diisi"),
+      tanggal_selesai: Yup.string().required("Tanggal Selesai Harus Diisi"),
+      keterangan: Yup.string().required("Keterangan Harus Diisi"),
+      kwitansi: Yup.string().required("Kwitansi Harus Diisi"),
     }),
 
     onSubmit: (values) => {
+      console.log("🚀 ~ PengajuanPerbaikan ~ values:", values);
       if (isEdit) {
       } else {
-        handlePostBarangKeluar(values);
+        handlePostPerbaikan(values);
       }
       if (isLoading) {
         toggle();
@@ -179,7 +209,7 @@ const PengajuanPerbaikan = () => {
         enableSorting: true,
         cell: (cell: any) => (
           <div className="flex gap-3">
-            {cell.row.original.status !== "disetujui" ? null : (
+            {cell.row.original.status === "disetuji" ? null : (
               <Link
                 to="#!"
                 className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
@@ -187,6 +217,8 @@ const PengajuanPerbaikan = () => {
                   const data = cell.row.original;
                   if (user.user.role === "admin") {
                     updateStatus(data.id);
+                  } else {
+                    onClickDelete(data);
                   }
                 }}
               >
@@ -259,19 +291,21 @@ const PengajuanPerbaikan = () => {
     }
   };
 
-  const handlePostBarangKeluar = async (data: any) => {
+  const handlePostPerbaikan = async (data: any) => {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("id_barang_masuk", data.id_barang);
-      formData.append("id_kondisi", data.id_kondisi);
-      formData.append("jumlah", data.jumlah);
-      formData.append("penerima", data.penerima);
-      formData.append("tanggal_keluar", data.tanggal_keluar);
+      formData.append("id_barang_masuk", data.id_barang_masuk);
+      formData.append("tanggal_perbaikan", data.tanggal_perbaikan);
+      formData.append("tanggal_selesai", data.tanggal_selesai);
+      formData.append("biaya", data.biaya);
       formData.append("keterangan", data.keterangan);
+      formData.append("jumlah", data.jumlah);
+      formData.append("kwitansi", data.kwitansi);
+      formData.append("status", "proses");
 
       const userResponse = await axiosInstance.post(
-        "/api/barang-keluar",
+        "/api/perbaikan",
         formData,
         {
           headers: {
@@ -300,45 +334,24 @@ const PengajuanPerbaikan = () => {
   const handleDeleteDataBarangMasuk = async (id: any) => {
     try {
       setIsLoading(true);
-      const userResponse = await axiosInstance.delete(
-        `/api/barang-keluar/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+      const userResponse = await axiosInstance.delete(`/api/perbaikan/${id}`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
 
       if (userResponse.data.success === true) {
-        Success("Data Barang Keluar Berhasil Dihapus");
+        Success("Data Perbaikan Berhasil Dihapus");
         fetchDataPerbaikan();
       }
     } catch (error: any) {
-      Error("Data Barang Keluar Gagal Dihapus");
+      Error("Data Perbaikan Gagal Dihapus");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
       }
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const [kondisi, setKondisi] = useState<any>([]);
-
-  const fetchDataKondisi = async () => {
-    try {
-      const response = await axiosInstance.get("/api/kondisi", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      setKondisi(response.data.data.data);
-    } catch (error: any) {
-      if (error.response.status === 401) {
-        localStorage.removeItem("authUser");
-        naviagate("/login");
-      }
     }
   };
 
@@ -362,7 +375,6 @@ const PengajuanPerbaikan = () => {
 
   useEffect(() => {
     fetchDataPerbaikan();
-    fetchDataKondisi();
     fetchDataBarang();
   }, []);
 
@@ -524,24 +536,58 @@ const PengajuanPerbaikan = () => {
             ></div>
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
+                <div className="relative size-24 mx-auto mb-4 shadow-md bg-slate-100 profile-user dark:bg-zink-500">
+                  {selectedImage ? (
+                    <img
+                      src={selectedImage || validation.values.kwitansi}
+                      alt=""
+                      className="object-cover w-full h-full user-profile-image"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full">
+                      <ClipboardList className="size-8 text-slate-500 fill-slate-200 dark:text-zink-200 dark:fill-zink-500" />
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 flex items-center justify-center size-8 rounded-full ltr:right-0 rtl:left-0 profile-photo-edit">
+                    <input
+                      id="profile-img-file-input"
+                      name="kwitansi"
+                      type="file"
+                      accept="image/*"
+                      className="hidden profile-img-file-input"
+                      onChange={handleImageChange}
+                    />
+                    <label
+                      htmlFor="profile-img-file-input"
+                      className="flex items-center justify-center size-8 bg-white rounded-full shadow-lg cursor-pointer dark:bg-zink-600 profile-photo-edit"
+                    >
+                      <ImagePlus className="size-4 text-slate-500 fill-slate-200 dark:text-zink-200 dark:fill-zink-500" />
+                    </label>
+                  </div>
+                </div>
+                {validation.touched.kwitansi && validation.errors.kwitansi ? (
+                  <p className="text-red-400">{validation.errors.kwitansi}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
                 <label
-                  htmlFor="id_barang"
+                  htmlFor="id_barang_masuk"
                   className="inline-block mb-2 text-base font-medium"
                 >
                   Pilih Barang
                 </label>
                 <select
-                  id="id_barang"
+                  id="id_barang_masuk"
                   className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_barang"
+                  name="id_barang_masuk"
                   onChange={(e) => {
                     validation.handleChange(e);
-                    validation.setFieldValue("id_barang", e.target.value);
+                    validation.setFieldValue("id_barang_masuk", e.target.value);
                   }}
                   onBlur={validation.handleBlur}
                   value={
-                    validation.values.id_barang ||
-                    (eventData && eventData.id_barang.id) ||
+                    validation.values.id_barang_masuk ||
+                    (eventData && eventData.id_barang_masuk.id) ||
                     ""
                   }
                 >
@@ -552,42 +598,11 @@ const PengajuanPerbaikan = () => {
                     </option>
                   ))}
                 </select>
-                {validation.touched.id_barang && validation.errors.id_barang ? (
-                  <p className="text-red-400">{validation.errors.id_barang}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="id_kondisi"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Kondisi
-                </label>
-                <select
-                  id="id_kondisi"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_kondisi"
-                  onChange={(e) => {
-                    validation.handleChange(e);
-                    validation.setFieldValue("id_kondisi", e.target.value);
-                  }}
-                  onBlur={validation.handleBlur}
-                  value={
-                    validation.values.id_kondisi ||
-                    (eventData && eventData.id_kondisi.id) ||
-                    ""
-                  }
-                >
-                  <option value="">Pilih Kondisi</option>
-                  {kondisi.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
-                    </option>
-                  ))}
-                </select>
-                {validation.touched.id_kondisi &&
-                validation.errors.id_kondisi ? (
-                  <p className="text-red-400">{validation.errors.id_kondisi}</p>
+                {validation.touched.id_barang_masuk &&
+                validation.errors.id_barang_masuk ? (
+                  <p className="text-red-400">
+                    {validation.errors.id_barang_masuk}
+                  </p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
@@ -612,44 +627,67 @@ const PengajuanPerbaikan = () => {
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="penerima"
+                  htmlFor="biaya"
                   className="inline-block mb-2 text-balance font-medium"
                 >
-                  Penerima
+                  Biaya
                 </label>
                 <input
-                  type="text"
-                  id="penerima"
+                  type="number"
+                  id="biaya"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Penerima"
-                  name="penerima"
+                  placeholder="Biaya"
+                  name="biaya"
                   onChange={validation.handleChange}
-                  value={validation.values.penerima || ""}
+                  value={validation.values.biaya || ""}
                 />
-                {validation.touched.penerima && validation.errors.penerima ? (
-                  <p className="text-red-400">{validation.errors.penerima}</p>
+                {validation.touched.biaya && validation.errors.biaya ? (
+                  <p className="text-red-400">{validation.errors.biaya}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="tanggal_keluar"
+                  htmlFor="tanggal_perbaikan"
                   className="inline-block mb-2 text-balance font-medium"
                 >
-                  Tanggal Keluar
+                  Tanggal Perbaikan
                 </label>
                 <input
                   type="date"
-                  id="tanggal_keluar"
+                  id="tanggal_perbaikan"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Tanggal Keluar"
-                  name="tanggal_keluar"
+                  placeholder="Tanggal Perbaikan"
+                  name="tanggal_perbaikan"
                   onChange={validation.handleChange}
-                  value={validation.values.tanggal_keluar || ""}
+                  value={validation.values.tanggal_perbaikan || ""}
                 />
-                {validation.touched.tanggal_keluar &&
-                validation.errors.tanggal_keluar ? (
+                {validation.touched.tanggal_perbaikan &&
+                validation.errors.tanggal_perbaikan ? (
                   <p className="text-red-400">
-                    {validation.errors.tanggal_keluar}
+                    {validation.errors.tanggal_perbaikan}
+                  </p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="tanggal_selesai"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Tanggal Selesai
+                </label>
+                <input
+                  type="date"
+                  id="tanggal_selesai"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Tanggal Selesai"
+                  name="tanggal_selesai"
+                  onChange={validation.handleChange}
+                  value={validation.values.tanggal_selesai || ""}
+                />
+                {validation.touched.tanggal_selesai &&
+                validation.errors.tanggal_selesai ? (
+                  <p className="text-red-400">
+                    {validation.errors.tanggal_selesai}
                   </p>
                 ) : null}
               </div>
@@ -691,11 +729,7 @@ const PengajuanPerbaikan = () => {
                 disabled={isLoading}
                 className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
               >
-                {isLoading
-                  ? "Loading"
-                  : !!isEdit
-                  ? "Update"
-                  : "Add Barang Keluar"}
+                {isLoading ? "Loading" : !!isEdit ? "Update" : "Add Perbaikan"}
               </button>
             </div>
           </form>
