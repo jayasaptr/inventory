@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 
 //import images
-import userProfile from "assets/images/users/user-profile.png";
 import logoSm from "assets/images/logo-sm.png";
 import logoDark from "assets/images/logo-dark.png";
 import logoLight from "assets/images/logo-light.png";
@@ -231,7 +230,7 @@ const Header = ({ handleToggleDrawer, handleDrawer }: any) => {
                   >
                     <div className="bg-pink-100 rounded-full">
                       <img
-                        src={userProfile}
+                        src={user.user.foto}
                         alt=""
                         className="size-[37.5px] rounded-full"
                       />
@@ -249,7 +248,7 @@ const Header = ({ handleToggleDrawer, handleDrawer }: any) => {
                       <div className="relative inline-block shrink-0">
                         <div className="rounded bg-slate-100 dark:bg-zink-500">
                           <img
-                            src={userProfile}
+                            src={user.user.foto}
                             alt=""
                             className="size-12 rounded"
                           />
