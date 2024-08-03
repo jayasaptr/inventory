@@ -6,10 +6,10 @@ import Ecommerce from "pages/Dashboards/Ecommerce";
 import CategoryPage from "pages/Category/CategoryPage";
 import KondisiPage from "pages/Kondisi/KondisiPage";
 import RuanganPage from "pages/Ruangan/RuanganPage";
-import BarangPage from "pages/Barang/BarangPage";
 import BarangMasukPage from "pages/BarangMasuk/BarangMasukPage";
 import BarangKeluarPage from "pages/BarangKeluar/BarangKeluarPage";
 import PengajuanPerbaikan from "pages/PengajuanPerbaikan/PerbaikanPage";
+import BarangRuanganPage from "pages/BarangRuangan/BarangRuanganPage";
 
 const RouteIndex = () => {
   return (
@@ -25,6 +25,7 @@ const RouteIndex = () => {
         <Route path="/barang-masuk" Component={BarangMasukPage} />
         <Route path="/barang-keluar" Component={BarangKeluarPage} />
         <Route path="/pengajuan-perbaikan" Component={PengajuanPerbaikan} />
+        <Route path="/permintaan-barang" Component={BarangRuanganPage} />
       </Routes>
     </React.Fragment>
   );

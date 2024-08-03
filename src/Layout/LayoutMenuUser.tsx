@@ -47,16 +47,22 @@ const menuUser: any = [
     isTitle: true,
   },
   {
+    id: "Permintaan Baran",
+    label: "Permintaan Barang",
+    icon: <Share2 />,
+    link: "/permintaan-barang",
+  },
+  {
     id: "Pengajuan Perbaikan",
     label: "Pengajuan Perbaikan",
     icon: <Award />,
     link: "/pengajuan-perbaikan",
   },
   {
-    id: "Permintaan Baran",
-    label: "Permintaan Barang",
-    icon: <Share2 />,
-    link: "/permintaan-barang",
+    id: "Barang Keluar",
+    label: "Barang Keluar",
+    icon: <PackagePlus />,
+    link: "/barang-keluar",
   },
 ];
 

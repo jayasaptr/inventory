@@ -91,16 +91,16 @@ const menuData: any = [
     isTitle: true,
   },
   {
-    id: "Pengajuan Perbaikan",
-    label: "Pengajuan Perbaikan",
-    icon: <Award />,
-    link: "/pengajuan-perbaikan",
-  },
-  {
     id: "Permintaan Baran",
     label: "Permintaan Barang",
     icon: <Share2 />,
     link: "/permintaan-barang",
+  },
+  {
+    id: "Pengajuan Perbaikan",
+    label: "Pengajuan Perbaikan",
+    icon: <Award />,
+    link: "/pengajuan-perbaikan",
   },
 ];
 

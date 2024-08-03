@@ -21,7 +21,7 @@ import Modal from "Common/Components/Modal";
 import { axiosInstance } from "lib/axios";
 import Layout from "Layout";
 
-const PengajuanPerbaikan = () => {
+const BarangRuanganPage = () => {
   const [data, setData] = useState<any>([]);
   const [eventData, setEventData] = useState<any>();
   const [id, setId] = useState<number>(0);
@@ -82,28 +82,22 @@ const PengajuanPerbaikan = () => {
     initialValues: {
       id: (eventData && eventData.id) || "",
       id_barang_masuk: (eventData && eventData.id_barang_masuk.id) || "",
+      id_ruangan: (eventData && eventData.id_ruangan.id) || "",
       jumlah: (eventData && eventData.jumlah) || "",
-      biaya: (eventData && eventData.biaya) || "",
-      tanggal_perbaikan: (eventData && eventData.tanggal_perbaikan) || "",
-      tanggal_selesai: (eventData && eventData.tanggal_selesai) || "",
       keterangan: (eventData && eventData.keterangan) || "",
-      kwitansi: (eventData && eventData.kwitansi) || "",
     },
     validationSchema: Yup.object({
       id_barang_masuk: Yup.string().required("Pilih Barang"),
-      jumlah: Yup.number().required("Jumlah Harus Diisi"),
-      biaya: Yup.number().required("Biaya Harus Diisi"),
-      tanggal_perbaikan: Yup.string().required("Tanggal Perbaikan Harus Diisi"),
-      tanggal_selesai: Yup.string().required("Tanggal Selesai Harus Diisi"),
-      keterangan: Yup.string().required("Keterangan Harus Diisi"),
-      kwitansi: Yup.string().required("Kwitansi Harus Diisi"),
+      id_ruangan: Yup.string().required("Pilih Ruangan"),
+      jumlah: Yup.number().required("Jumlah harus diisi"),
+      keterangan: Yup.string().required("Keterangan harus diisi"),
     }),
 
     onSubmit: (values) => {
       console.log("🚀 ~ PengajuanPerbaikan ~ values:", values);
       if (isEdit) {
       } else {
-        handlePostPerbaikan(values);
+        handlePostPermintaan(values);
       }
       if (isLoading) {
         toggle();
@@ -145,20 +139,6 @@ const PengajuanPerbaikan = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Kwitansi",
-        cell: (cell: any) => (
-          <button
-            onClick={() => handleShowImage(cell.row.original.kwitansi)}
-            className="flex items-center gap-3"
-          >
-            <div className="size-6 bg-slate-100">
-              <img src={cell.row.original.kwitansi} alt="" className="h-6" />
-            </div>
-            <h6 className="grow">{cell.getValue()}</h6>
-          </button>
-        ),
-      },
-      {
         header: "Nama",
         accessorKey: "id_barang_masuk.nama",
         enableColumnFilter: false,
@@ -169,23 +149,8 @@ const PengajuanPerbaikan = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Tanggal Perbaikan",
-        accessorKey: "tanggal_perbaikan",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Tanggal Selesai",
-        accessorKey: "tanggal_selesai",
-        enableColumnFilter: false,
-      },
-      {
         header: "Jumlah",
         accessorKey: "jumlah",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Biaya",
-        accessorKey: "biaya",
         enableColumnFilter: false,
       },
       {
@@ -194,13 +159,18 @@ const PengajuanPerbaikan = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Kepala Ruangan",
-        accessorKey: "id_user.name",
+        header: "Ruangan",
+        accessorKey: "id_ruangan.nama",
         enableColumnFilter: false,
       },
       {
         header: "Status",
         accessorKey: "status",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Tanggal Permintaan",
+        accessorKey: "tanggal",
         enableColumnFilter: false,
       },
       {
@@ -238,10 +208,10 @@ const PengajuanPerbaikan = () => {
 
   const naviagate = useNavigate();
 
-  const fetchDataPerbaikan = async () => {
+  const fetchDataBarangRuangan = async () => {
     setLoadingV(true);
-    const userQuery = "api/perbaikan?search=" + user.user.id;
-    const adminQuery = "api/perbaikan";
+    const userQuery = "api/barang-ruangan?search=" + user.user.id;
+    const adminQuery = "api/barang-ruangan";
 
     try {
       const userResponse = await axiosInstance.get(
@@ -269,7 +239,7 @@ const PengajuanPerbaikan = () => {
     formData.append("status", "disetuji");
     try {
       const response = await axiosInstance.post(
-        `/api/perbaikan/${id}`,
+        `/api/barang-ruangan/${id}`,
         formData,
         {
           headers: {
@@ -280,7 +250,7 @@ const PengajuanPerbaikan = () => {
 
       if (response.data.success === true) {
         Success("Status Perbaikan Berhasil Diupdate");
-        fetchDataPerbaikan();
+        fetchDataBarangRuangan();
       }
     } catch (error: any) {
       Error("Status Perbaikan Gagal Diupdate");
@@ -291,21 +261,20 @@ const PengajuanPerbaikan = () => {
     }
   };
 
-  const handlePostPerbaikan = async (data: any) => {
+  const handlePostPermintaan = async (data: any) => {
     try {
       setIsLoading(true);
       const formData = new FormData();
       formData.append("id_barang_masuk", data.id_barang_masuk);
-      formData.append("tanggal_perbaikan", data.tanggal_perbaikan);
-      formData.append("tanggal_selesai", data.tanggal_selesai);
-      formData.append("biaya", data.biaya);
-      formData.append("keterangan", data.keterangan);
+      formData.append("id_ruangan", data.id_ruangan);
       formData.append("jumlah", data.jumlah);
-      formData.append("kwitansi", data.kwitansi);
-      formData.append("status", "proses");
+      formData.append("keterangan", data.keterangan);
+      formData.append("id_user", user.user.id);
+      formData.append("tanggal", new Date().toISOString().split("T")[0]);
+      formData.append("status", "diproses");
 
       const userResponse = await axiosInstance.post(
-        "/api/perbaikan",
+        "/api/barang-ruangan",
         formData,
         {
           headers: {
@@ -317,7 +286,7 @@ const PengajuanPerbaikan = () => {
 
       if (userResponse.data.success === true) {
         Success("Data Barang Keluar Berhasil Ditambahkan");
-        fetchDataPerbaikan();
+        fetchDataBarangRuangan();
         toggle();
       }
     } catch (error: any) {
@@ -334,18 +303,21 @@ const PengajuanPerbaikan = () => {
   const handleDeleteDataBarangMasuk = async (id: any) => {
     try {
       setIsLoading(true);
-      const userResponse = await axiosInstance.delete(`/api/perbaikan/${id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      const userResponse = await axiosInstance.delete(
+        `/api/barang-ruangan/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
 
       if (userResponse.data.success === true) {
-        Success("Data Perbaikan Berhasil Dihapus");
-        fetchDataPerbaikan();
+        Success("Barang Berhasil Dihapus");
+        fetchDataBarangRuangan();
       }
     } catch (error: any) {
-      Error("Data Perbaikan Gagal Dihapus");
+      Error("Barang Gagal Dihapus");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -359,14 +331,11 @@ const PengajuanPerbaikan = () => {
 
   const fetchDataBarang = async () => {
     try {
-      const response = await axiosInstance.get(
-        `/api/barang-ruangan?search${user.user.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+      const response = await axiosInstance.get("/api/barang-masuk", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       setBarang(response.data.data.data);
     } catch (error: any) {
       if (error.response.status === 401) {
@@ -376,8 +345,32 @@ const PengajuanPerbaikan = () => {
     }
   };
 
+  const [ruangan, setRuangan] = useState<any>([]);
+
+  const fetchDataRuanganByUserId = async () => {
+    const idUser = user.user.id;
+    console.log("🚀 ~ fetchDataRuanganByUserId ~ idUser:", idUser);
+    try {
+      const response = await axiosInstance.get(
+        `/api/ruangan-user?id_user=${idUser}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      setRuangan(response.data.data);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
+    }
+  };
+
   useEffect(() => {
-    fetchDataPerbaikan();
+    fetchDataRuanganByUserId();
+    fetchDataBarangRuangan();
     fetchDataBarang();
   }, []);
 
@@ -409,7 +402,10 @@ const PengajuanPerbaikan = () => {
 
   return (
     <Layout>
-      <BreadCrumb title="Data Barang" pageTitle="Barang" />
+      <BreadCrumb
+        title="Data Permintaan Barang"
+        pageTitle="Permintaan Barang"
+      />
       <DeleteModal
         show={deleteModal}
         onHide={deleteToggle}
@@ -449,7 +445,7 @@ const PengajuanPerbaikan = () => {
         <div className="card-body">
           <div className="flex items-center gap-3 mb-4">
             <h6 className="text-15 grow">
-              Perbaikan (<b className="total-Employs">{data.length}</b>)
+              Permintaan (<b className="total-Employs">{data.length}</b>)
             </h6>
             {user.user.role === "admin" ? null : (
               <div className="shrink-0">
@@ -461,7 +457,7 @@ const PengajuanPerbaikan = () => {
                   onClick={toggle}
                 >
                   <Plus className="inline-block size-4" />{" "}
-                  <span className="align-middle">Ajukan Perbaikan</span>
+                  <span className="align-middle">Ajukan Permintaan</span>
                 </Link>
               </div>
             )}
@@ -516,7 +512,7 @@ const PengajuanPerbaikan = () => {
           closeButtonClass="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500"
         >
           <Modal.Title className="text-16">
-            {!!isEdit ? "Edit Barang" : "Add Barang Masuk"}
+            {!!isEdit ? "Edit Barang" : "Ajukan Permintaan"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
@@ -538,40 +534,6 @@ const PengajuanPerbaikan = () => {
               className="hidden px-4 py-3 text-sm text-red-500 border border-transparent rounded-md bg-red-50 dark:bg-red-500/20"
             ></div>
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-              <div className="xl:col-span-12">
-                <div className="relative size-24 mx-auto mb-4 shadow-md bg-slate-100 profile-user dark:bg-zink-500">
-                  {selectedImage ? (
-                    <img
-                      src={selectedImage || validation.values.kwitansi}
-                      alt=""
-                      className="object-cover w-full h-full user-profile-image"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center w-full h-full">
-                      <ClipboardList className="size-8 text-slate-500 fill-slate-200 dark:text-zink-200 dark:fill-zink-500" />
-                    </div>
-                  )}
-                  <div className="absolute bottom-0 flex items-center justify-center size-8 rounded-full ltr:right-0 rtl:left-0 profile-photo-edit">
-                    <input
-                      id="profile-img-file-input"
-                      name="kwitansi"
-                      type="file"
-                      accept="image/*"
-                      className="hidden profile-img-file-input"
-                      onChange={handleImageChange}
-                    />
-                    <label
-                      htmlFor="profile-img-file-input"
-                      className="flex items-center justify-center size-8 bg-white rounded-full shadow-lg cursor-pointer dark:bg-zink-600 profile-photo-edit"
-                    >
-                      <ImagePlus className="size-4 text-slate-500 fill-slate-200 dark:text-zink-200 dark:fill-zink-500" />
-                    </label>
-                  </div>
-                </div>
-                {validation.touched.kwitansi && validation.errors.kwitansi ? (
-                  <p className="text-red-400">{validation.errors.kwitansi}</p>
-                ) : null}
-              </div>
               <div className="xl:col-span-12">
                 <label
                   htmlFor="id_barang_masuk"
@@ -596,8 +558,8 @@ const PengajuanPerbaikan = () => {
                 >
                   <option value="">Pilih Barang</option>
                   {barang.map((item: any, index: number) => (
-                    <option key={index} value={item.id_barang_masuk.id}>
-                      {item.id_barang_masuk.nama}
+                    <option key={index} value={item.id}>
+                      {item.nama}
                     </option>
                   ))}
                 </select>
@@ -606,6 +568,40 @@ const PengajuanPerbaikan = () => {
                   <p className="text-red-400">
                     {validation.errors.id_barang_masuk}
                   </p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="id_ruangan"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  Pilih Ruangan
+                </label>
+                <select
+                  id="id_ruangan"
+                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  name="id_ruangan"
+                  onChange={(e) => {
+                    validation.handleChange(e);
+                    validation.setFieldValue("id_ruangan", e.target.value);
+                  }}
+                  onBlur={validation.handleBlur}
+                  value={
+                    validation.values.id_ruangan ||
+                    (eventData && eventData.id_ruangan.id) ||
+                    ""
+                  }
+                >
+                  <option value="">Pilih Ruangan</option>
+                  {ruangan.map((item: any, index: number) => (
+                    <option key={index} value={item.id}>
+                      {item.nama}
+                    </option>
+                  ))}
+                </select>
+                {validation.touched.id_ruangan &&
+                validation.errors.id_ruangan ? (
+                  <p className="text-red-400">{validation.errors.id_ruangan}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
@@ -626,72 +622,6 @@ const PengajuanPerbaikan = () => {
                 />
                 {validation.touched.jumlah && validation.errors.jumlah ? (
                   <p className="text-red-400">{validation.errors.jumlah}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="biaya"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Biaya
-                </label>
-                <input
-                  type="number"
-                  id="biaya"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Biaya"
-                  name="biaya"
-                  onChange={validation.handleChange}
-                  value={validation.values.biaya || ""}
-                />
-                {validation.touched.biaya && validation.errors.biaya ? (
-                  <p className="text-red-400">{validation.errors.biaya}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="tanggal_perbaikan"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Tanggal Perbaikan
-                </label>
-                <input
-                  type="date"
-                  id="tanggal_perbaikan"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Tanggal Perbaikan"
-                  name="tanggal_perbaikan"
-                  onChange={validation.handleChange}
-                  value={validation.values.tanggal_perbaikan || ""}
-                />
-                {validation.touched.tanggal_perbaikan &&
-                validation.errors.tanggal_perbaikan ? (
-                  <p className="text-red-400">
-                    {validation.errors.tanggal_perbaikan}
-                  </p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="tanggal_selesai"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Tanggal Selesai
-                </label>
-                <input
-                  type="date"
-                  id="tanggal_selesai"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Tanggal Selesai"
-                  name="tanggal_selesai"
-                  onChange={validation.handleChange}
-                  value={validation.values.tanggal_selesai || ""}
-                />
-                {validation.touched.tanggal_selesai &&
-                validation.errors.tanggal_selesai ? (
-                  <p className="text-red-400">
-                    {validation.errors.tanggal_selesai}
-                  </p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
@@ -732,7 +662,7 @@ const PengajuanPerbaikan = () => {
                 disabled={isLoading}
                 className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
               >
-                {isLoading ? "Loading" : !!isEdit ? "Update" : "Add Perbaikan"}
+                {isLoading ? "Loading" : !!isEdit ? "Update" : "Add Permintaan"}
               </button>
             </div>
           </form>
@@ -742,4 +672,4 @@ const PengajuanPerbaikan = () => {
   );
 };
 
-export default PengajuanPerbaikan;
+export default BarangRuanganPage;
