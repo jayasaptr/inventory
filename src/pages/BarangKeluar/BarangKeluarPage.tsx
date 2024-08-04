@@ -55,6 +55,7 @@ const BarangKeluarPage = () => {
     initialValues: {
       // id: (eventData && eventData.id) || "",
       id_barang: (eventData && eventData.id_barang.id) || "",
+      id_barang_user: (eventData && eventData.id_barang_user) || "",
       id_kondisi: (eventData && eventData.id_kondisi.id) || "",
       jumlah: (eventData && eventData.jumlah) || "",
       penerima: (eventData && eventData.penerima) || "",
@@ -63,11 +64,11 @@ const BarangKeluarPage = () => {
     },
     validationSchema: Yup.object({
       id_barang: Yup.string().required("Pilih Barang"),
-      id_kondisi: Yup.string().required("Pilih Kondisi"),
-      jumlah: Yup.string().required("Jumlah harus diisi"),
-      penerima: Yup.string().required("Penerima harus diisi"),
-      tanggal_keluar: Yup.string().required("Tanggal Keluar harus diisi"),
-      keterangan: Yup.string().required("Keterangan harus diisi"),
+      // id_kondisi: Yup.string().required("Pilih Kondisi"),
+      // jumlah: Yup.string().required("Jumlah harus diisi"),
+      // penerima: Yup.string().required("Penerima harus diisi"),
+      // tanggal_keluar: Yup.string().required("Tanggal Keluar harus diisi"),
+      // keterangan: Yup.string().required("Keterangan harus diisi"),
     }),
 
     onSubmit: (values) => {
@@ -198,44 +199,6 @@ const BarangKeluarPage = () => {
     }
   };
 
-  const handlePostBarangKeluar = async (data: any) => {
-    try {
-      setIsLoading(true);
-      const formData = new FormData();
-      formData.append("id_barang_masuk", data.id_barang);
-      formData.append("id_kondisi", data.id_kondisi);
-      formData.append("jumlah", data.jumlah);
-      formData.append("penerima", data.penerima);
-      formData.append("tanggal_keluar", data.tanggal_keluar);
-      formData.append("keterangan", data.keterangan);
-
-      const userResponse = await axiosInstance.post(
-        "/api/barang-keluar",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (userResponse.data.success === true) {
-        Success("Data Barang Keluar Berhasil Ditambahkan");
-        fetchDataBarangKeluar();
-        toggle();
-      }
-    } catch (error: any) {
-      Error("Data Barang Keluar Gagal Ditambahkan");
-      if (error.response.status === 401) {
-        localStorage.removeItem("authUser");
-        naviagate("/login");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleDeleteDataBarangMasuk = async (id: any) => {
     try {
       setIsLoading(true);
@@ -283,14 +246,72 @@ const BarangKeluarPage = () => {
 
   const [barang, setBarang] = useState<any>([]);
 
+  const handlePostBarangKeluar = async (data: any) => {
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+
+      if (user.user.role === "admin") {
+        formData.append("id_barang_masuk", data.id_barang);
+      } else {
+        const dataBarang = JSON.parse(data.id_barang);
+        formData.append("id_barang_ruang", dataBarang.id);
+        formData.append("id_barang_masuk", dataBarang.id_barang_masuk.id);
+      }
+      formData.append("id_kondisi", data.id_kondisi);
+      formData.append("jumlah", data.jumlah);
+      formData.append("penerima", data.penerima);
+      formData.append("tanggal_keluar", data.tanggal_keluar);
+      formData.append("keterangan", data.keterangan);
+
+      const userResponse = await axiosInstance.post(
+        "/api/barang-keluar",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (userResponse.data.success === true) {
+        Success("Data Barang Keluar Berhasil Ditambahkan");
+        fetchDataBarangKeluar();
+        toggle();
+      }
+    } catch (error: any) {
+      Error("Data Barang Keluar Gagal Ditambahkan");
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchDataBarang = async () => {
     try {
-      const response = await axiosInstance.get("/api/barang-masuk", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      setBarang(response.data.data.data);
+      // cek jika role admin
+      if (user.user.role === "admin") {
+        const response = await axiosInstance.get("/api/barang-masuk", {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+        setBarang(response.data.data.data);
+      } else {
+        const response = await axiosInstance.get(
+          `/api/barang-ruangan?search=${user.user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
+        setBarang(response.data.data.data);
+      }
     } catch (error: any) {
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
@@ -450,8 +471,18 @@ const BarangKeluarPage = () => {
                   className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                   name="id_barang"
                   onChange={(e) => {
+                    // const datas = JSON.parse(e.target.value);
                     validation.handleChange(e);
                     validation.setFieldValue("id_barang", e.target.value);
+                    // if (user.user.role === "admin") {
+                    //   validation.setFieldValue("id_barang", e.target.value);
+                    // } else {
+                    //   validation.setFieldValue("id_barang", datas.id);
+                    //   validation.setFieldValue(
+                    //     "id_barang_user",
+                    //     datas.id_barang_masuk.id
+                    //   );
+                    // }
                   }}
                   onBlur={validation.handleBlur}
                   value={
@@ -462,8 +493,17 @@ const BarangKeluarPage = () => {
                 >
                   <option value="">Pilih Barang</option>
                   {barang.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
+                    <option
+                      key={index}
+                      value={
+                        user.user.role === "admin"
+                          ? item.id
+                          : JSON.stringify(item)
+                      }
+                    >
+                      {user.user.role === "admin"
+                        ? item.nama
+                        : item.id_barang_masuk.nama}
                     </option>
                   ))}
                 </select>
