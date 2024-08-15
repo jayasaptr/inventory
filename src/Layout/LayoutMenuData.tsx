@@ -21,6 +21,7 @@ import {
   Trophy,
   School,
   UserRound,
+  FileLineChart,
 } from "lucide-react";
 
 const menuData: any = [
@@ -101,6 +102,58 @@ const menuData: any = [
     label: "Pengajuan Perbaikan",
     icon: <Award />,
     link: "/pengajuan-perbaikan",
+  },
+  {
+    label: "Laporan",
+    isTitle: true,
+  },
+  {
+    id: "Laporan Barang Masuk",
+    label: "Barang Masuk",
+    icon: <FileLineChart />,
+    link: "/laporan-barang-masuk",
+  },
+  {
+    id: "Laporan Barang Keluar",
+    label: "Barang Keluar",
+    icon: <FileLineChart />,
+    link: "/laporan-barang-keluar",
+  },
+  {
+    id: "Laporan Permintaan Barang",
+    label: "Permintaan Barang",
+    icon: <FileLineChart />,
+    link: "/laporan-permintaan-barang",
+  },
+  {
+    id: "Laporan Pengajuan Perbaikan",
+    label: "Pengajuan Perbaikan",
+    icon: <FileLineChart />,
+    link: "/laporan-pengajuan-perbaikan",
+  },
+  {
+    id: "Laporan Barang Habis",
+    label: "Barang Habis",
+    icon: <FileLineChart />,
+    link: "/laporan-barang-rusak",
+  },
+  {
+    id: "Laporan Barang Rusak",
+    label: "Barang Rusak",
+    icon: <FileLineChart />,
+    link: "/laporan-barang-rusak",
+  },
+  {
+    id: "Laporan Barang Hilang",
+    label: "Barang Hilang",
+    icon: <FileLineChart />,
+    link: "/laporan-barang-hilang",
+  },
+  {
+    id: "Laporan Barang Service",
+    label: "Barang Service",
+    icon: <FileLineChart />,
+    link: "/laporan-barang-service",
   },
 ];
 

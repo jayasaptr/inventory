@@ -9,10 +9,16 @@ import withRouter from "Common/withRouter";
 
 //i18n
 import { withTranslation } from "react-i18next";
+import { menuKabag } from "Layout/LayoutMenuKabag";
 
 const VerticalLayout = (props: any) => {
   const user = JSON.parse(localStorage.getItem("authUser") || "{}");
-  const data = user.user.role === "admin" ? menuData : menuUser;
+  const data =
+    user.user.role === "admin"
+      ? menuData
+      : user.user.role == "staf"
+      ? menuUser
+      : menuKabag;
   return (
     <React.Fragment>
       {(data || [])?.map((item: any, key: number) => {

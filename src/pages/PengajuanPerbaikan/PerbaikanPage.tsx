@@ -215,14 +215,14 @@ const PengajuanPerbaikan = () => {
                 className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
                 onClick={() => {
                   const data = cell.row.original;
-                  if (user.user.role === "admin") {
+                  if (user.user.role === "admin" || user.user.role == "staf") {
                     updateStatus(data.id);
                   } else {
                     onClickDelete(data);
                   }
                 }}
               >
-                {user.user.role === "admin" ? (
+                {user.user.role === "admin" || user.user.role == "staf" ? (
                   <Check className="size-4" />
                 ) : (
                   <Trash2 className="size-4" />
@@ -245,7 +245,9 @@ const PengajuanPerbaikan = () => {
 
     try {
       const userResponse = await axiosInstance.get(
-        user.user.role === "admin" ? adminQuery : userQuery,
+        user.user.role === "admin" || user.user.role === "staf"
+          ? adminQuery
+          : userQuery,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -359,15 +361,24 @@ const PengajuanPerbaikan = () => {
 
   const fetchDataBarang = async () => {
     try {
-      const response = await axiosInstance.get(
-        `/api/barang-ruangan?search${user.user.id}`,
-        {
+      if (user.user.role === "kabag") {
+        const response = await axiosInstance.get(
+          `/api/barang-ruangan?search=${user.user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
+        setBarang(response.data.data.data);
+      } else {
+        const response = await axiosInstance.get(`/api/barang-masuk`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
-        }
-      );
-      setBarang(response.data.data.data);
+        });
+        setBarang(response.data.data.data);
+      }
     } catch (error: any) {
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
@@ -516,7 +527,7 @@ const PengajuanPerbaikan = () => {
           closeButtonClass="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500"
         >
           <Modal.Title className="text-16">
-            {!!isEdit ? "Edit Barang" : "Add Barang Masuk"}
+            {!!isEdit ? "Edit Barang" : "Tambahkan Perbaikan"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
@@ -572,42 +583,87 @@ const PengajuanPerbaikan = () => {
                   <p className="text-red-400">{validation.errors.kwitansi}</p>
                 ) : null}
               </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="id_barang_masuk"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Pilih Barang
-                </label>
-                <select
-                  id="id_barang_masuk"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_barang_masuk"
-                  onChange={(e) => {
-                    validation.handleChange(e);
-                    validation.setFieldValue("id_barang_masuk", e.target.value);
-                  }}
-                  onBlur={validation.handleBlur}
-                  value={
-                    validation.values.id_barang_masuk ||
-                    (eventData && eventData.id_barang_masuk.id) ||
-                    ""
-                  }
-                >
-                  <option value="">Pilih Barang</option>
-                  {barang.map((item: any, index: number) => (
-                    <option key={index} value={item.id_barang_masuk.id}>
-                      {item.id_barang_masuk.nama}
-                    </option>
-                  ))}
-                </select>
-                {validation.touched.id_barang_masuk &&
-                validation.errors.id_barang_masuk ? (
-                  <p className="text-red-400">
-                    {validation.errors.id_barang_masuk}
-                  </p>
-                ) : null}
-              </div>
+              {user.user.role === "kabag" ? (
+                <div className="xl:col-span-12">
+                  <label
+                    htmlFor="id_barang_masuk"
+                    className="inline-block mb-2 text-base font-medium"
+                  >
+                    Pilih Barang
+                  </label>
+                  <select
+                    id="id_barang_masuk"
+                    className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    name="id_barang_masuk"
+                    onChange={(e) => {
+                      validation.handleChange(e);
+                      validation.setFieldValue(
+                        "id_barang_masuk",
+                        e.target.value
+                      );
+                    }}
+                    onBlur={validation.handleBlur}
+                    value={
+                      validation.values.id_barang_masuk ||
+                      (eventData && eventData.id_barang_masuk.id) ||
+                      ""
+                    }
+                  >
+                    <option value="">Pilih Barang</option>
+                    {barang.map((item: any, index: number) => (
+                      <option key={index} value={item.id_barang_masuk.id}>
+                        {item.id_barang_masuk.nama}
+                      </option>
+                    ))}
+                  </select>
+                  {validation.touched.id_barang_masuk &&
+                  validation.errors.id_barang_masuk ? (
+                    <p className="text-red-400">
+                      {validation.errors.id_barang_masuk}
+                    </p>
+                  ) : null}
+                </div>
+              ) : (
+                <div className="xl:col-span-12">
+                  <label
+                    htmlFor="id_barang_masuk"
+                    className="inline-block mb-2 text-base font-medium"
+                  >
+                    Pilih Barang
+                  </label>
+                  <select
+                    id="id_barang_masuk"
+                    className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    name="id_barang_masuk"
+                    onChange={(e) => {
+                      validation.handleChange(e);
+                      validation.setFieldValue(
+                        "id_barang_masuk",
+                        e.target.value
+                      );
+                    }}
+                    onBlur={validation.handleBlur}
+                    value={
+                      validation.values.id_barang_masuk ||
+                      (eventData && eventData.id_barang_masuk.id) ||
+                      ""
+                    }
+                  >
+                    <option value="">Pilih Barang</option>
+                    {barang.map((item: any, index: number) => (
+                      <option key={index} value={item.id}>
+                        {item.nama}
+                      </option>
+                    ))}
+                  </select>
+                  {validation.touched.id_barang_masuk &&
+                  validation.errors.id_barang_masuk ? (
+                    <p className="text-red-400">
+                      {validation.errors.id_barang_masuk}
+                    </p>
+                  ) : null}
+                </div>
+              )}
               <div className="xl:col-span-12">
                 <label
                   htmlFor="jumlah"

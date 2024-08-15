@@ -135,7 +135,6 @@ const Layout = ({ children }: any) => {
   const user = JSON.parse(localStorage.getItem("authUser")!);
 
   if (user == null) {
-    console.log("disini");
     return <Navigate to="/login" />;
   }
 

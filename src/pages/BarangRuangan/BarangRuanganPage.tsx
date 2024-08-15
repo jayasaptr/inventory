@@ -185,14 +185,14 @@ const BarangRuanganPage = () => {
                 className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
                 onClick={() => {
                   const data = cell.row.original;
-                  if (user.user.role === "admin") {
+                  if (user.user.role === "admin" || user.user.role === "staf") {
                     updateStatus(data.id);
                   } else {
                     onClickDelete(data);
                   }
                 }}
               >
-                {user.user.role === "admin" ? (
+                {user.user.role === "admin" || user.user.role === "staf" ? (
                   <Check className="size-4" />
                 ) : (
                   <Trash2 className="size-4" />
@@ -215,7 +215,9 @@ const BarangRuanganPage = () => {
 
     try {
       const userResponse = await axiosInstance.get(
-        user.user.role === "admin" ? adminQuery : userQuery,
+        user.user.role === "admin" || user.user.role === "staf"
+          ? adminQuery
+          : userQuery,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -349,17 +351,25 @@ const BarangRuanganPage = () => {
 
   const fetchDataRuanganByUserId = async () => {
     const idUser = user.user.id;
-    console.log("🚀 ~ fetchDataRuanganByUserId ~ idUser:", idUser);
     try {
-      const response = await axiosInstance.get(
-        `/api/ruangan-user?id_user=${idUser}`,
-        {
+      if (user.user.role === "kabag") {
+        const response = await axiosInstance.get(
+          `/api/ruangan-user?id_user=${idUser}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
+        setRuangan(response.data.data);
+      } else {
+        const response = await axiosInstance.get(`/api/ruangan`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
-        }
-      );
-      setRuangan(response.data.data);
+        });
+        setRuangan(response.data.data.data);
+      }
     } catch (error: any) {
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");

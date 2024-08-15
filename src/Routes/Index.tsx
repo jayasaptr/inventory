@@ -10,6 +10,7 @@ import BarangMasukPage from "pages/BarangMasuk/BarangMasukPage";
 import BarangKeluarPage from "pages/BarangKeluar/BarangKeluarPage";
 import PengajuanPerbaikan from "pages/PengajuanPerbaikan/PerbaikanPage";
 import BarangRuanganPage from "pages/BarangRuangan/BarangRuanganPage";
+import ReportBarangMasuk from "report/BarangMasuk";
 
 const RouteIndex = () => {
   return (
@@ -26,6 +27,7 @@ const RouteIndex = () => {
         <Route path="/barang-keluar" Component={BarangKeluarPage} />
         <Route path="/pengajuan-perbaikan" Component={PengajuanPerbaikan} />
         <Route path="/permintaan-barang" Component={BarangRuanganPage} />
+        <Route path="/laporan-barang-masuk" Component={ReportBarangMasuk} />
       </Routes>
     </React.Fragment>
   );

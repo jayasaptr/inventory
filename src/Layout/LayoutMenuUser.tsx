@@ -43,6 +43,38 @@ const menuUser: any = [
     ],
   },
   {
+    label: "Data Master",
+    isTitle: true,
+  },
+  {
+    id: "Category",
+    label: "Category",
+    icon: <Copy />,
+    link: "/category",
+  },
+  {
+    id: "Kondisi",
+    label: "Kondisi",
+    icon: <MonitorDot />,
+    link: "/kondisi",
+  },
+  {
+    id: "Ruangan",
+    label: "Ruangan",
+    icon: <School />,
+    link: "/ruangan",
+  },
+  {
+    label: "Data Barang",
+    isTitle: true,
+  },
+  {
+    id: "Barang Masuk",
+    label: "Barang Masuk",
+    icon: <PackagePlus />,
+    link: "/barang-masuk",
+  },
+  {
     label: "Data Lainnya",
     isTitle: true,
   },
@@ -57,12 +89,6 @@ const menuUser: any = [
     label: "Pengajuan Perbaikan",
     icon: <Award />,
     link: "/pengajuan-perbaikan",
-  },
-  {
-    id: "Barang Keluar",
-    label: "Barang Keluar",
-    icon: <PackagePlus />,
-    link: "/barang-keluar",
   },
 ];
 

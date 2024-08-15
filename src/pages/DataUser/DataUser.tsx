@@ -615,7 +615,8 @@ const DataUser = () => {
                   value={validation.values.role || ""}
                 >
                   <option value="admin">Admin</option>
-                  <option value="guru">Guru</option>
+                  <option value="staf">Staff</option>
+                  <option value="kabag">Kabag</option>
                 </select>
                 {validation.touched.role && validation.errors.role ? (
                   <p className="text-red-400">{validation.errors.role}</p>
