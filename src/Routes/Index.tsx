@@ -11,6 +11,18 @@ import BarangKeluarPage from "pages/BarangKeluar/BarangKeluarPage";
 import PengajuanPerbaikan from "pages/PengajuanPerbaikan/PerbaikanPage";
 import BarangRuanganPage from "pages/BarangRuangan/BarangRuanganPage";
 import ReportBarangMasuk from "report/BarangMasuk";
+import BarangPage from "pages/Barang/BarangPage";
+import ReportBarangKeluar from "report/BarangKeluar";
+import ReportPengajuanPerbaikan from "report/PengajuanPerbaikan";
+import ReportPermintaanBarang from "report/PermintaanBarang";
+import SuratKeteranganAktif from "pages/SuratKeteranganAktif/SuratKeteranganAktif";
+import SuratTugas from "pages/SuratTugas/SuratTugas";
+import SuratBaik from "pages/SuratBaik/SuratBaik";
+import PengarsipanSurat from "pages/Surat/SuratPage";
+import ReportArsiSurat from "report/LaporanArsipSurat";
+import ReportArsiSuratTugas from "report/LaporanSuratTugas";
+import ReportArsiSuratAktif from "report/LaporanSuratAktif";
+import ReportArsiSuratBaik from "report/LaporanSuratBaik";
 
 const RouteIndex = () => {
   return (
@@ -23,11 +35,38 @@ const RouteIndex = () => {
         <Route path="/category" Component={CategoryPage} />
         <Route path="/kondisi" Component={KondisiPage} />
         <Route path="/ruangan" Component={RuanganPage} />
+        <Route path="/barang" Component={BarangPage} />
         <Route path="/barang-masuk" Component={BarangMasukPage} />
         <Route path="/barang-keluar" Component={BarangKeluarPage} />
         <Route path="/pengajuan-perbaikan" Component={PengajuanPerbaikan} />
         <Route path="/permintaan-barang" Component={BarangRuanganPage} />
         <Route path="/laporan-barang-masuk" Component={ReportBarangMasuk} />
+        <Route
+          path="/surat-keterangan-aktif"
+          Component={SuratKeteranganAktif}
+        />
+        <Route path="/surat-tugas" Component={SuratTugas} />
+        <Route path="/surat-berkelakuan-baik" Component={SuratBaik} />
+        <Route path="/pengarsipan-surat" Component={PengarsipanSurat} />
+        <Route
+          path="/laporan-permintaan-barang"
+          Component={ReportPermintaanBarang}
+        />
+        <Route path="/laporan-barang-keluar" Component={ReportBarangKeluar} />
+        <Route
+          path="/laporan-pengajuan-perbaikan"
+          Component={ReportPengajuanPerbaikan}
+        />
+        <Route path="/laporan-arsip-surat" Component={ReportArsiSurat} />
+        <Route path="/laporan-surat-tugas" Component={ReportArsiSuratTugas} />
+        <Route
+          path="/laporan-surat-keterangan-aktif"
+          Component={ReportArsiSuratAktif}
+        />
+        <Route
+          path="/laporan-surat-berkelakuan-baik"
+          Component={ReportArsiSuratBaik}
+        />
       </Routes>
     </React.Fragment>
   );

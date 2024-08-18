@@ -1,10 +1,8 @@
 import BreadCrumb from "Common/BreadCrumb";
 import DeleteModal from "Common/DeleteModal";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ToastContainer } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { ToastContainer, toast } from "react-toastify";
 import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
 // Formik
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -12,6 +10,8 @@ import TableContainer from "Common/TableContainer";
 import Modal from "Common/Components/Modal";
 import { axiosInstance } from "lib/axios";
 import Layout from "Layout";
+import ReactToPrint, { useReactToPrint } from "react-to-print";
+import PrintBarang from "./PrintBarang";
 
 const BarangPage = () => {
   const [data, setData] = useState<any>([]);
@@ -39,8 +39,6 @@ const BarangPage = () => {
       setDeleteModal(false);
     }
   };
-  //
-
   // Update Data
   const handleUpdateDataClick = (ele: any) => {
     setEventData({ ...ele });
@@ -123,54 +121,19 @@ const BarangPage = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Jumlah",
-        accessorKey: "jumlah",
+        header: "Jumlah Barang di Gudang",
+        accessorKey: "total_barang_tersedia",
         enableColumnFilter: false,
       },
       {
-        header: "Satuan",
-        accessorKey: "satuan",
+        header: "Jumlah Barang di Ruangan",
+        accessorKey: "total_barang_ruangan",
         enableColumnFilter: false,
       },
       {
-        header: "Harga",
-        accessorKey: "harga",
+        header: "Jumlah Barang Keluar",
+        accessorKey: "total_barang_keluar",
         enableColumnFilter: false,
-      },
-      {
-        header: "Keterangan",
-        accessorKey: "keterangan",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Action",
-        enableColumnFilter: false,
-        enableSorting: true,
-        cell: (cell: any) => (
-          <div className="flex gap-3">
-            <Link
-              to="#!"
-              data-modal-target="addEmployeeModal"
-              className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
-              onClick={() => {
-                const data = cell.row.original;
-                handleUpdateDataClick(data);
-              }}
-            >
-              <Pencil className="size-4" />
-            </Link>
-            <Link
-              to="#!"
-              className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
-              onClick={() => {
-                const data = cell.row.original;
-                onClickDelete(data);
-              }}
-            >
-              <Trash2 className="size-4" />
-            </Link>
-          </div>
-        ),
       },
     ],
     []
@@ -178,18 +141,19 @@ const BarangPage = () => {
 
   const user = JSON.parse(localStorage.getItem("authUser")!);
 
+  const [idCategory, setIdCategory] = useState<any>("");
+
   const fetchDataBarang = async () => {
     try {
       const userResponse = await axiosInstance.get("/api/barang", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
+        params: {
+          id_category: idCategory,
+        },
       });
-      console.log(
-        "🚀 ~ fetchDataUser ~ userResponse:",
-        userResponse.data.data.data
-      );
-      setData(userResponse.data.data.data);
+      setData(userResponse.data.data);
     } catch (error) {
       console.log("🚀 ~ fetchDataUser ~ error:", error);
     }
@@ -305,7 +269,13 @@ const BarangPage = () => {
   useEffect(() => {
     fetchDataBarang();
     fetchDataCategory();
-  }, []);
+  }, [idCategory]);
+
+  const printRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: "Your Document Title",
+  });
 
   return (
     <Layout>
@@ -327,19 +297,33 @@ const BarangPage = () => {
         <div className="card-body">
           <div className="flex items-center gap-3 mb-4">
             <h6 className="text-15 grow">
-              Kondisi (<b className="total-Employs">{data.length}</b>)
+              Barang (<b className="total-Employs">{data.length}</b>)
             </h6>
             <div className="shrink-0">
-              <Link
-                to="#!"
-                data-modal-target="addEmployeeModal"
-                type="button"
-                className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee"
-                onClick={toggle}
-              >
-                <Plus className="inline-block size-4" />{" "}
-                <span className="align-middle">Add Barang</span>
-              </Link>
+              <div className="xl:col-span-12 flex flex-row">
+                {/* <ReactToPrint
+                  trigger={() => {
+                    return <button className="btn btn-primary">Print</button>;
+                  }}
+                  content={() => printRef.current}
+                /> */}
+                <select
+                  id="id_category"
+                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  name="id_category"
+                  onChange={(e) => {
+                    setIdCategory(e.target.value);
+                  }}
+                  value={idCategory || "0"} // set default value
+                >
+                  <option value="0">Semua Category</option>
+                  {category.map((item: any, index: number) => (
+                    <option key={index} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
           {data && data.length > 0 ? (
@@ -373,6 +357,98 @@ const BarangPage = () => {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* print */}
+
+      <div style={{ display: "none" }}>
+        <div ref={printRef} className="p-6 bg-white dark:bg-zink-800">
+          <div className="text-center mb-4">
+            <div className="flex items-center justify-center mb-2">
+              <img
+                src="/images/pondok.png"
+                alt="School Logo"
+                className="h-24 w-24 mr-4"
+              />
+              <div className="text-center">
+                <h1 className="text-lg font-bold">
+                  PEMERINTAH KABUPATEN CILAWANG
+                </h1>
+                <h2 className="text-lg font-bold">
+                  DINAS PENDIDIKAN, PEMUDA, DAN OLAHRAGA
+                </h2>
+                <h3 className="text-xl font-bold">SMA NEGERI 2 GUSU LAN</h3>
+                <p className="text-sm">
+                  Jl. Kalianget No. 13 Gusu Lan, Cilawang Kode Pos 6548
+                </p>
+                <p className="text-sm">
+                  website: gusulan.cilawang.sch.id, Email: gusulan@gmail.com
+                </p>
+              </div>
+            </div>
+            <hr className="border-t-2 border-black" />
+          </div>
+          <h2 className="text-2xl font-bold text-center mb-4">Data Barang</h2>
+          <table className="min-w-full divide-y divide-slate-200 dark:divide-zink-600">
+            <thead className="bg-slate-100 dark:bg-zink-700">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-zink-200 uppercase tracking-wider">
+                  No
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-zink-200 uppercase tracking-wider">
+                  Nama Barang
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-zink-200 uppercase tracking-wider">
+                  Kategori
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-zink-200 uppercase tracking-wider">
+                  Harga
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-zink-200 uppercase tracking-wider">
+                  Stok
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-zink-800 divide-y divide-slate-200 dark:divide-zink-600">
+              {data && data.length > 0 ? (
+                data.map((item: any, index: number) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-zink-100">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-zink-200">
+                      {item.namaBarang}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-zink-200">
+                      {item.kategori}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-zink-200">
+                      {item.harga}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-zink-200">
+                      {item.stok}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-center text-slate-500 dark:text-zink-200"
+                  >
+                    No data available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          <div className="mt-8 text-right">
+            <p className="text-sm">Cilawang, [Tanggal Cetak]</p>
+            <p className="text-sm">Kepala Sekolah</p>
+            <div className="h-24"></div>
+            <p className="text-sm font-bold">[Nama Kepala Sekolah]</p>
+          </div>
         </div>
       </div>
 

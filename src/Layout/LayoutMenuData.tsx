@@ -72,8 +72,42 @@ const menuData: any = [
     link: "/ruangan",
   },
   {
+    label: "Data Surat",
+    isTitle: true,
+  },
+  {
+    id: "Surat Tugas",
+    label: "Surat Tugas",
+    icon: <Mail />,
+    link: "/surat-tugas",
+  },
+  {
+    id: "Surat Keterangan Aktif",
+    label: "Surat Keterangan Aktif",
+    icon: <Mail />,
+    link: "/surat-keterangan-aktif",
+  },
+  {
+    id: "Surat Berkelakuan Baik",
+    label: "Surat Berkelakuan Baik",
+    icon: <Mail />,
+    link: "/surat-berkelakuan-baik",
+  },
+  {
+    id: "Pengarsipan Surat",
+    label: "Pengarsipan Surat",
+    icon: <Mail />,
+    link: "/pengarsipan-surat",
+  },
+  {
     label: "Data Barang",
     isTitle: true,
+  },
+  {
+    id: "Barang",
+    label: "Barang",
+    icon: <PackagePlus />,
+    link: "/barang",
   },
   {
     id: "Barang Masuk",
@@ -104,7 +138,35 @@ const menuData: any = [
     link: "/pengajuan-perbaikan",
   },
   {
-    label: "Laporan",
+    label: "Laporan Surat",
+    isTitle: true,
+  },
+  {
+    id: "Laporan Arsip Surat",
+    label: "Arsip Surat",
+    icon: <FileLineChart />,
+    link: "/laporan-arsip-surat",
+  },
+  {
+    id: "Laporan Surat Tugas",
+    label: "Surat Tugas",
+    icon: <FileLineChart />,
+    link: "/laporan-surat-tugas",
+  },
+  {
+    id: "Laporan Surat Keterangan Aktif",
+    label: "Surat Keterangan Aktif",
+    icon: <FileLineChart />,
+    link: "/laporan-surat-keterangan-aktif",
+  },
+  {
+    id: "Laporan Surat Berkelakuan Baik",
+    label: "Surat Berkelakuan Baik",
+    icon: <FileLineChart />,
+    link: "/laporan-surat-berkelakuan-baik",
+  },
+  {
+    label: "Laporan Barang",
     isTitle: true,
   },
   {
@@ -130,30 +192,6 @@ const menuData: any = [
     label: "Pengajuan Perbaikan",
     icon: <FileLineChart />,
     link: "/laporan-pengajuan-perbaikan",
-  },
-  {
-    id: "Laporan Barang Habis",
-    label: "Barang Habis",
-    icon: <FileLineChart />,
-    link: "/laporan-barang-rusak",
-  },
-  {
-    id: "Laporan Barang Rusak",
-    label: "Barang Rusak",
-    icon: <FileLineChart />,
-    link: "/laporan-barang-rusak",
-  },
-  {
-    id: "Laporan Barang Hilang",
-    label: "Barang Hilang",
-    icon: <FileLineChart />,
-    link: "/laporan-barang-hilang",
-  },
-  {
-    id: "Laporan Barang Service",
-    label: "Barang Service",
-    icon: <FileLineChart />,
-    link: "/laporan-barang-service",
   },
 ];
 

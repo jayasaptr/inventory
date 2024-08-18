@@ -10,50 +10,38 @@ import Flatpickr from "react-flatpickr";
 import ReportPrint from "./print/ReportPrint";
 import ReactToPrint from "react-to-print";
 
-const ReportBarangMasuk = () => {
+const ReportArsiSurat = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
 
   const columns: column[] = React.useMemo(
     () => [
       {
-        header: "Nama",
-        accessorKey: "nama",
+        header: "No Surat",
+        accessorKey: "nomor_surat",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Merk",
-        accessorKey: "merk",
+        header: "Instansi",
+        accessorKey: "instansi",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Category",
-        accessorKey: "id_category.name",
+        header: "Keterangan",
+        accessorKey: "keterangan",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Kondisi",
-        accessorKey: "id_kondisi.nama",
+        header: "Jenis Surat",
+        accessorKey: "jenis_surat",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Jumlah",
-        accessorKey: "jumlah",
-        enableColumnFilter: false,
-        enableSorting: true,
-      },
-      {
-        header: "Total Harga",
-        accessorKey: "total_harga",
-        enableColumnFilter: false,
-        enableSorting: true,
-      },
-      {
-        header: "Tanggal Masuk",
-        accessorKey: "tanggal_masuk",
+        header: "Tanggal Surat",
+        accessorKey: "tanggal_surat",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -72,33 +60,21 @@ const ReportBarangMasuk = () => {
 
   const [loadingV, setLoadingV] = useState(false);
 
-  const [idKondisi, setIdKondisi] = useState<any>("");
-  const [kondisi, setKondisi] = useState([]);
+  const [jenisSurat, setJenisSurat] = useState("");
 
-  const fetchDataKondisi = async () => {
-    try {
-      const response = await axiosInstance.get("/api/kondisi", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      setKondisi(response.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataCategory= ~ error:", error);
-    }
-  };
+
 
   const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/report-barang-masuk", {
+      const userResponse = await axiosInstance.get("/api/surat", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
         params: {
           start_date: startDate,
           end_date: endDate,
-          id_kondisi: idKondisi,
+          jenis_surat: jenisSurat,
         },
       });
       setData(userResponse.data.data.data);
@@ -122,31 +98,27 @@ const ReportBarangMasuk = () => {
 
   React.useEffect(() => {
     fetchDataBarangMasuk();
-    fetchDataKondisi();
-  }, [startDate, endDate, idKondisi]);
+  }, [startDate, endDate, jenisSurat]);
 
   return (
     <Layout>
-      <BreadCrumb title="Report Barang Masuk" pageTitle="Report Barang Masuk" />
+      <BreadCrumb title="Report Arsip Surat" pageTitle="Report Arsip Surat" />
       <div className="card">
         <div className="card-body">
           <div className="flex gap-2 mb-4 justify-end">
-          <select
-                  id="id_category"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_category"
-                  onChange={(e) => {
-                    setIdKondisi(e.target.value);
-                  }}
-                  value={idKondisi || "0"} // set default value
-                >
-                  <option value="0">Semua Kondisi</option>
-                  {kondisi.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
-                    </option>
-                  ))}
-                </select>
+            <select
+              id="id_category"
+              className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+              name="id_category"
+              onChange={(e) => {
+                setJenisSurat(e.target.value);
+              }}
+              value={jenisSurat || "0"} // set default value
+            >
+              <option value="0">Semua Jenis Surat</option>
+              <option value="surat masuk">Surat Masuk</option>
+              <option value="surat keluar">Surat Keluar</option>
+            </select>
             <div className="relative">
               {/* <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -228,35 +200,36 @@ const ReportBarangMasuk = () => {
       </div>
 
       <div style={{ display: "none" }}>
-        <ReportPrint ref={printRef} title="Report Barang Masuk">
-          <TableContainer
-            isPagination={false}
-            isTfoot={false}
-            isSelect={false}
-            isGlobalFilter={false}
-            columns={columns || []}
-            data={
-              data.map((item: any) => {
-                return {
-                  ...item,
-                  jumlah: item.jumlah,
-                  harga: item.harga,
-                  total_harga: item.jumlah * item.harga,
-                };
-              }) || []
-            }
-            divclassName="my-2 col-span-12 overflow-x-auto lg:col-span-12 border border-gray-300"
-            tableclassName="display dataTable w-full text-sm align-middle whitespace-nowrap"
-            theadclassName="border-b border-slate-200 dark:border-zink-500"
-            trclassName="group-[.stripe]:even:bg-slate-50 group-[.stripe]:dark:even:bg-zink-600 transition-all duration-150 ease-linear group-[.hover]:hover:bg-slate-50 dark:group-[.hover]:hover:bg-zink-600 [&.selected]:bg-custom-500 dark:[&.selected]:bg-custom-500 [&.selected]:text-custom-50 dark:[&.selected]:text-custom-50"
-            thclassName="p-3 group-[.bordered]:border group-[.bordered]:border-slate-200 group-[.bordered]:dark:border-zink-500 sorting px-3 py-4 text-slate-900 bg-slate-200/50 font-semibold text-left dark:text-zink-50 dark:bg-zink-600 dark:group-[.bordered]:border-zink-500"
-            tdclassName="p-3 group-[.bordered]:border group-[.bordered]:border-slate-200 group-[.bordered]:dark:border-zink-500"
-            PaginationClassName="flex flex-col items-center mt-5 md:flex-row"
-          />
+        <ReportPrint ref={printRef} title="Report Arsip Surat">
+        <TableContainer
+              isPagination={true}
+              isTfoot={true}
+              isSelect={false}
+              isGlobalFilter={false}
+              columns={columns || []}
+              data={
+                data.map((item: any) => {
+                  return {
+                    ...item,
+                    jumlah: item.jumlah,
+                    harga: item.harga,
+                    total_harga: item.jumlah * item.harga,
+                  };
+                }) || []
+              }
+              customPageSize={10}
+              divclassName="my-2 col-span-12 overflow-x-auto lg:col-span-12"
+              tableclassName="display dataTable w-full text-sm align-middle whitespace-nowrap"
+              theadclassName="border-b border-slate-200 dark:border-zink-500"
+              trclassName="group-[.stripe]:even:bg-slate-50 group-[.stripe]:dark:even:bg-zink-600 transition-all duration-150 ease-linear group-[.hover]:hover:bg-slate-50 dark:group-[.hover]:hover:bg-zink-600 [&.selected]:bg-custom-500 dark:[&.selected]:bg-custom-500 [&.selected]:text-custom-50 dark:[&.selected]:text-custom-50"
+              thclassName="p-3 group-[.bordered]:border group-[.bordered]:border-slate-200 group-[.bordered]:dark:border-zink-500 sorting px-3 py-4 text-slate-900 bg-slate-200/50 font-semibold text-left dark:text-zink-50 dark:bg-zink-600 dark:group-[.bordered]:border-zink-500"
+              tdclassName="p-3 group-[.bordered]:border group-[.bordered]:border-slate-200 group-[.bordered]:dark:border-zink-500 truncate"
+              PaginationClassName="flex flex-col items-center mt-5 md:flex-row"
+            />
         </ReportPrint>
       </div>
     </Layout>
   );
 };
 
-export default ReportBarangMasuk;
+export default ReportArsiSurat;

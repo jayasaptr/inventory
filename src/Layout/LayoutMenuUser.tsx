@@ -65,6 +65,22 @@ const menuUser: any = [
     link: "/ruangan",
   },
   {
+    label: "Data Surat",
+    isTitle: true,
+  },
+  {
+    id: "Surat Keterangan Aktif",
+    label: "Surat Keterangan Aktif",
+    icon: <Mail />,
+    link: "/surat-keterangan-aktif",
+  },
+  {
+    id: "Surat Berkelakuan Baik",
+    label: "Surat Berkelakuan Baik",
+    icon: <Mail />,
+    link: "/surat-berkelakuan-baik",
+  },
+  {
     label: "Data Barang",
     isTitle: true,
   },

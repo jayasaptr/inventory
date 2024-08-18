@@ -10,26 +10,26 @@ import Flatpickr from "react-flatpickr";
 import ReportPrint from "./print/ReportPrint";
 import ReactToPrint from "react-to-print";
 
-const ReportBarangMasuk = () => {
+const ReportBarangKeluar = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
 
   const columns: column[] = React.useMemo(
     () => [
       {
         header: "Nama",
-        accessorKey: "nama",
+        accessorKey: "id_barang_masuk.nama",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
         header: "Merk",
-        accessorKey: "merk",
+        accessorKey: "id_barang_masuk.merk",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Category",
-        accessorKey: "id_category.name",
+        header: "Kategori",
+        accessorKey: "id_barang_masuk.id_category.name",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -46,14 +46,14 @@ const ReportBarangMasuk = () => {
         enableSorting: true,
       },
       {
-        header: "Total Harga",
-        accessorKey: "total_harga",
+        header: "Tanggal Keluar",
+        accessorKey: "tanggal_keluar",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Tanggal Masuk",
-        accessorKey: "tanggal_masuk",
+        header: "Keterangan",
+        accessorKey: "keterangan",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -91,16 +91,19 @@ const ReportBarangMasuk = () => {
   const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/report-barang-masuk", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        params: {
-          start_date: startDate,
-          end_date: endDate,
-          id_kondisi: idKondisi,
-        },
-      });
+      const userResponse = await axiosInstance.get(
+        "/api/report-barang-keluar",
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+          params: {
+            start_date: startDate,
+            end_date: endDate,
+            id_kondisi: idKondisi,
+          },
+        }
+      );
       setData(userResponse.data.data.data);
     } catch (error: any) {
       if (error.response.status === 401) {
@@ -127,26 +130,29 @@ const ReportBarangMasuk = () => {
 
   return (
     <Layout>
-      <BreadCrumb title="Report Barang Masuk" pageTitle="Report Barang Masuk" />
+      <BreadCrumb
+        title="Report Barang Keluar"
+        pageTitle="Report Barang Keluar"
+      />
       <div className="card">
         <div className="card-body">
           <div className="flex gap-2 mb-4 justify-end">
-          <select
-                  id="id_category"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_category"
-                  onChange={(e) => {
-                    setIdKondisi(e.target.value);
-                  }}
-                  value={idKondisi || "0"} // set default value
-                >
-                  <option value="0">Semua Kondisi</option>
-                  {kondisi.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
-                    </option>
-                  ))}
-                </select>
+            <select
+              id="id_category"
+              className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+              name="id_category"
+              onChange={(e) => {
+                setIdKondisi(e.target.value);
+              }}
+              value={idKondisi || "0"} // set default value
+            >
+              <option value="0">Semua Kondisi</option>
+              {kondisi.map((item: any, index: number) => (
+                <option key={index} value={item.id}>
+                  {item.nama}
+                </option>
+              ))}
+            </select>
             <div className="relative">
               {/* <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -154,6 +160,7 @@ const ReportBarangMasuk = () => {
               >
                 Pilih Tanggal
               </button> */}
+
               <div className="flex flex-row gap-2">
                 <Flatpickr
                   options={{
@@ -228,7 +235,7 @@ const ReportBarangMasuk = () => {
       </div>
 
       <div style={{ display: "none" }}>
-        <ReportPrint ref={printRef} title="Report Barang Masuk">
+        <ReportPrint ref={printRef} title="Report Barang Keluar">
           <TableContainer
             isPagination={false}
             isTfoot={false}
@@ -259,4 +266,4 @@ const ReportBarangMasuk = () => {
   );
 };
 
-export default ReportBarangMasuk;
+export default ReportBarangKeluar;
