@@ -71,6 +71,7 @@ const SuratBaik = () => {
       tanggal_lahir: (eventData && eventData.tanggal_lahir) || "",
       jenis_kelamin: (eventData && eventData.jenis_kelamin) || "",
       alamat: (eventData && eventData.alamat) || "",
+      nisn: (eventData && eventData.nisn) || "",
     },
     validationSchema: Yup.object({
       nomor_surat: Yup.string().required("No Surat is Required"),
@@ -80,6 +81,7 @@ const SuratBaik = () => {
       tanggal_lahir: Yup.string().required("Tanggal Lahir is Required"),
       jenis_kelamin: Yup.string().required("Jenis Kelamin is Required"),
       alamat: Yup.string().required("Alamat is Required"),
+      nisn: Yup.string().required("NISN is Required"),
     }),
 
     onSubmit: (values) => {
@@ -291,6 +293,7 @@ const SuratBaik = () => {
       formData.append("tanggal_lahir", data.tanggal_lahir);
       formData.append("jenis_kelamin", data.jenis_kelamin);
       formData.append("alamat", data.alamat);
+      formData.append("nisn", data.nisn);
 
       const userResponse = await axiosInstance.post(
         "/api/surat-baik",
@@ -330,6 +333,7 @@ const SuratBaik = () => {
       formData.append("tanggal_lahir", data.tanggal_lahir);
       formData.append("jenis_kelamin", data.jenis_kelamin);
       formData.append("alamat", data.alamat);
+      formData.append("nisn", data.nisn);
 
       const userResponse = await axiosInstance.post(
         `/api/surat-baik/${data.id}`,
@@ -494,7 +498,9 @@ const SuratBaik = () => {
               SURAT KETERANGAN BERKELAKUAN BAIK
             </h1>
             <p className="text-center">
-              {`Nomor: w.o/6/PP.03.2/${validation.values.nomor_surat}/${new Date().getFullYear()}`}
+              {`Nomor: w.o/6/PP.03.2/${
+                validation.values.nomor_surat
+              }/${new Date().getFullYear()}`}
             </p>
             <div className="mt-8">
               <p>
@@ -507,6 +513,10 @@ const SuratBaik = () => {
                 <span className="font-bold">
                   {validation.values.nama_siswa}
                 </span>
+              </p>
+              <p>
+                NISN:{" "}
+                <span className="font-bold">{validation.values.nisn}</span>
               </p>
               <p>
                 Nama Orang Tua/Wali:{" "}
@@ -606,6 +616,26 @@ const SuratBaik = () => {
                   <p className="text-red-400">
                     {validation.errors.nomor_surat}
                   </p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="nisn"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  NISN
+                </label>
+                <input
+                  type="text"
+                  id="nisn"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Nisn"
+                  name="nisn"
+                  onChange={validation.handleChange}
+                  value={validation.values.nisn || ""}
+                />
+                {validation.touched.nisn && validation.errors.nisn ? (
+                  <p className="text-red-400">{validation.errors.nisn}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">

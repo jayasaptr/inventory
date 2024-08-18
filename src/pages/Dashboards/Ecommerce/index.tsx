@@ -17,16 +17,10 @@ const Ecommerce = () => {
     <Layout>
       <BreadCrumb title="Summary" pageTitle="Dashboards" />
       <div className="grid grid-cols-12 gap-x-5">
-        {/* <WelcomeWidget /> */}
-        <OrderStatistics />
         <Widgets />
-        <SalesRevenue />
-        <TrafficResources />
-        <ProductsOrders />
-        <CustomerService />
-        <SalesMonth />
-        <TopSellingProducts />
-        <Audience />
+        <div style={{ display: "none" }}>
+          <SalesRevenue />
+        </div>
       </div>
     </Layout>
   );

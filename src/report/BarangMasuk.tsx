@@ -131,22 +131,22 @@ const ReportBarangMasuk = () => {
       <div className="card">
         <div className="card-body">
           <div className="flex gap-2 mb-4 justify-end">
-          <select
-                  id="id_category"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_category"
-                  onChange={(e) => {
-                    setIdKondisi(e.target.value);
-                  }}
-                  value={idKondisi || "0"} // set default value
-                >
-                  <option value="0">Semua Kondisi</option>
-                  {kondisi.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
-                    </option>
-                  ))}
-                </select>
+            <select
+              id="id_category"
+              className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+              name="id_category"
+              onChange={(e) => {
+                setIdKondisi(e.target.value);
+              }}
+              value={idKondisi || "0"} // set default value
+            >
+              <option value="0">Semua Kondisi</option>
+              {kondisi.map((item: any, index: number) => (
+                <option key={index} value={item.id}>
+                  {item.nama}
+                </option>
+              ))}
+            </select>
             <div className="relative">
               {/* <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

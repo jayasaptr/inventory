@@ -23,6 +23,7 @@ import ReportArsiSurat from "report/LaporanArsipSurat";
 import ReportArsiSuratTugas from "report/LaporanSuratTugas";
 import ReportArsiSuratAktif from "report/LaporanSuratAktif";
 import ReportArsiSuratBaik from "report/LaporanSuratBaik";
+import ReportBarangKabag from "report/ReportBarangKabag";
 
 const RouteIndex = () => {
   return (
@@ -66,6 +67,11 @@ const RouteIndex = () => {
         <Route
           path="/laporan-surat-berkelakuan-baik"
           Component={ReportArsiSuratBaik}
+        />
+        <Route path="/report-barang-kabag" Component={ReportBarangKabag} />
+        <Route
+          path="/report-perbaikan-kabag"
+          Component={ReportPengajuanPerbaikan}
         />
       </Routes>
     </React.Fragment>

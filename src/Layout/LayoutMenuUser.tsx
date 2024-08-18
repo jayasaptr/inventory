@@ -81,6 +81,12 @@ const menuUser: any = [
     link: "/surat-berkelakuan-baik",
   },
   {
+    id: "Pengarsipan Surat",
+    label: "Pengarsipan Surat",
+    icon: <Mail />,
+    link: "/pengarsipan-surat",
+  },
+  {
     label: "Data Barang",
     isTitle: true,
   },

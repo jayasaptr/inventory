@@ -10,7 +10,7 @@ import Flatpickr from "react-flatpickr";
 import ReportPrint from "./print/ReportPrint";
 import ReactToPrint from "react-to-print";
 
-const ReportPermintaanBarang = () => {
+const ReportBarangKabag = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
 
   const columns: column[] = React.useMemo(
@@ -83,6 +83,7 @@ const ReportPermintaanBarang = () => {
   };
 
   const fetchDataBarangMasuk = async () => {
+    const idUser = user.user.id;
     setLoadingV(true);
     try {
       const userResponse = await axiosInstance.get(
@@ -95,9 +96,11 @@ const ReportPermintaanBarang = () => {
             start_date: startDate,
             end_date: endDate,
             status: idKondisi,
+            id_user: idUser,
           },
         }
       );
+      console.log("🚀 ~ fetchDataBarangMasuk ~ userResponse:", userResponse);
       setData(userResponse.data.data.data);
     } catch (error: any) {
       if (error.response && error.response.status === 401) {
@@ -124,10 +127,7 @@ const ReportPermintaanBarang = () => {
 
   return (
     <Layout>
-      <BreadCrumb
-        title="Report Permintaan Barang"
-        pageTitle="Report Permintaan Barang"
-      />
+      <BreadCrumb title="Report Barang" pageTitle="Report Barang" />
       <div className="card">
         <div className="card-body">
           <div className="flex gap-2 mb-4 justify-end">
@@ -257,4 +257,4 @@ const ReportPermintaanBarang = () => {
   );
 };
 
-export default ReportPermintaanBarang;
+export default ReportBarangKabag;

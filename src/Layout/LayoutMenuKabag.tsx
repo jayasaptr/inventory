@@ -84,7 +84,7 @@ const menuKabag: any = [
     id: "Barang Keluar",
     label: "Barang Keluar",
     icon: <FileLineChart />,
-    link: "/report-barang-keluar-kabag",
+    link: "/laporan-barang-keluar",
   },
 ];
 

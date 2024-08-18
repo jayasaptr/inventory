@@ -184,10 +184,6 @@ const BarangKeluarPage = () => {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      console.log(
-        "🚀 ~ fetchDataUser ~ userResponse:",
-        userResponse.data.data.data
-      );
       setData(userResponse.data.data.data);
     } catch (error: any) {
       if (error.response.status === 401) {

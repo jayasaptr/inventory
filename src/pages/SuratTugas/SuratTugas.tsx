@@ -69,6 +69,7 @@ const SuratTugas = () => {
       dasar: (eventData && eventData.dasar) || "",
       user_id: (eventData && eventData.user_id) || "",
       keterangan: (eventData && eventData.keterangan) || "",
+      jabatan: (eventData && eventData.jabatan) || "",
     },
     validationSchema: Yup.object({
       nomor_surat: Yup.string().required("No Surat is Required"),
@@ -76,6 +77,7 @@ const SuratTugas = () => {
       dasar: Yup.string().required("Dasar is Required"),
       user_id: Yup.string().required("User is Required"),
       keterangan: Yup.string().required("Keterangan is Required"),
+      jabatan: Yup.string().required("Jabatan is Required"),
     }),
 
     onSubmit: (values) => {
@@ -276,6 +278,7 @@ const SuratTugas = () => {
       formData.append("dasar", data.dasar);
       formData.append("user_id", data.user_id);
       formData.append("keterangan", data.keterangan);
+      formData.append("jabatan", data.jabatan);
 
       const userResponse = await axiosInstance.post(
         "/api/surat-tugas",
@@ -313,6 +316,7 @@ const SuratTugas = () => {
       formData.append("dasar", data.dasar);
       formData.append("user_id", data.user_id);
       formData.append("keterangan", data.keterangan);
+      formData.append("jabatan", data.jabatan);
 
       const userResponse = await axiosInstance.post(
         `/api/surat-tugas/${data.id}`,
@@ -493,7 +497,9 @@ const SuratTugas = () => {
           <div className="px-8 bg-white">
             <h1 className="text-center text-lg font-bold">SURAT TUGAS</h1>
             <p className="text-center">
-              {`Nomor: w.o/6/PP.03.2/${validation.values.nomor_surat}/${new Date().getFullYear()}`}
+              {`Nomor: w.o/6/PP.03.2/${
+                validation.values.nomor_surat
+              }/${new Date().getFullYear()}`}
             </p>
             <div className="mt-8">
               <p>Menimbang :</p>
@@ -521,7 +527,7 @@ const SuratTugas = () => {
               <p>
                 Jabatan:{" "}
                 <span className="font-bold">
-                  {eventData?.user_id?.role ?? ""}
+                  {validation.values.jabatan ?? ""}
                 </span>
               </p>
             </div>
@@ -605,7 +611,7 @@ const SuratTugas = () => {
                   type="text"
                   id="menimbang"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Nama Siswa"
+                  placeholder="Menimbang"
                   name="menimbang"
                   onChange={validation.handleChange}
                   value={validation.values.menimbang || ""}
@@ -625,7 +631,7 @@ const SuratTugas = () => {
                   type="text"
                   id="dasar"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Tempat Lahir"
+                  placeholder="Dasar"
                   name="dasar"
                   onChange={validation.handleChange}
                   value={validation.values.dasar || ""}
@@ -661,6 +667,26 @@ const SuratTugas = () => {
                 </select>
                 {validation.touched.user_id && validation.errors.user_id ? (
                   <p className="text-red-400">{validation.errors.user_id}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="jabatan"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  Jabatan
+                </label>
+                <input
+                  type="text"
+                  id="jabatan"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Jabatan"
+                  name="jabatan"
+                  onChange={validation.handleChange}
+                  value={validation.values.jabatan || ""}
+                />
+                {validation.touched.jabatan && validation.errors.jabatan ? (
+                  <p className="text-red-400">{validation.errors.jabatan}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">

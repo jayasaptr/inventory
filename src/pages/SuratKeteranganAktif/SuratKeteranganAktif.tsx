@@ -71,6 +71,7 @@ const SuratKeteranganAktif = () => {
       kelas: (eventData && eventData.kelas) || "",
       tahun_ajaran: (eventData && eventData.tahun_ajaran) || "",
       alamat: (eventData && eventData.alamat) || "",
+      nisn: (eventData && eventData.nisn) || "",
     },
     validationSchema: Yup.object({
       no_surat: Yup.string().required("No Surat is Required"),
@@ -80,6 +81,7 @@ const SuratKeteranganAktif = () => {
       kelas: Yup.string().required("Kelas is Required"),
       tahun_ajaran: Yup.string().required("Tahun Ajar is Required"),
       alamat: Yup.string().required("Alamat is Required"),
+      nisn: Yup.string().required("NISN is Required"),
     }),
 
     onSubmit: (values) => {
@@ -286,6 +288,7 @@ const SuratKeteranganAktif = () => {
       formData.append("kelas", data.kelas);
       formData.append("tahun_ajaran", data.tahun_ajaran);
       formData.append("alamat", data.alamat);
+      formData.append("nisn", data.nisn);
 
       const userResponse = await axiosInstance.post(
         "/api/surat-aktif",
@@ -325,6 +328,7 @@ const SuratKeteranganAktif = () => {
       formData.append("kelas", data.kelas);
       formData.append("tahun_ajaran", data.tahun_ajaran);
       formData.append("alamat", data.alamat);
+      formData.append("nisn", data.nisn);
 
       const userResponse = await axiosInstance.post(
         `/api/surat-aktif/${data.id}`,
@@ -525,7 +529,9 @@ const SuratKeteranganAktif = () => {
               SURAT KETERANGAN AKTIF
             </h1>
             <p className="text-center">
-              {`w.o/6/PP.03.2/${validation.values.nomor_surat}/${new Date().getFullYear()}`}
+              {`w.o/6/PP.03.2/${
+                validation.values.nomor_surat
+              }/${new Date().getFullYear()}`}
             </p>
             <div className="mt-8">
               <p>Yang bertanda tangan di bawah ini :</p>
@@ -548,6 +554,10 @@ const SuratKeteranganAktif = () => {
                 <span className="font-bold">
                   {validation.values.nama_siswa}
                 </span>
+              </p>
+              <p>
+                NISN:{" "}
+                <span className="font-bold">{validation.values.nisn}</span>
               </p>
               <p>
                 TTL:{" "}
@@ -646,6 +656,26 @@ const SuratKeteranganAktif = () => {
                 />
                 {validation.touched.no_surat && validation.errors.no_surat ? (
                   <p className="text-red-400">{validation.errors.no_surat}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="nisn"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  NISN
+                </label>
+                <input
+                  type="text"
+                  id="nisn"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Nisn"
+                  name="nisn"
+                  onChange={validation.handleChange}
+                  value={validation.values.nisn || ""}
+                />
+                {validation.touched.nisn && validation.errors.nisn ? (
+                  <p className="text-red-400">{validation.errors.nisn}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">

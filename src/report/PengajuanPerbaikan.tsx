@@ -105,6 +105,7 @@ const ReportPengajuanPerbaikan = () => {
           start_date: startDate,
           end_date: endDate,
           status: idKondisi,
+          ...(user.role !== "admin" && { id_user: user.user.id }),
         },
       });
       setData(userResponse.data.data.data);
