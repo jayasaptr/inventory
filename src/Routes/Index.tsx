@@ -24,6 +24,9 @@ import ReportArsiSuratTugas from "report/LaporanSuratTugas";
 import ReportArsiSuratAktif from "report/LaporanSuratAktif";
 import ReportArsiSuratBaik from "report/LaporanSuratBaik";
 import ReportBarangKabag from "report/ReportBarangKabag";
+import AssetPage from "pages/Asset/AssetPage";
+import PerbaikanAsset from "pages/PerbaikanAsset/PerbaikanAsset";
+import ReportPerbaikanAsset from "report/PerbaikanAsset";
 
 const RouteIndex = () => {
   return (
@@ -36,9 +39,11 @@ const RouteIndex = () => {
         <Route path="/category" Component={CategoryPage} />
         <Route path="/kondisi" Component={KondisiPage} />
         <Route path="/ruangan" Component={RuanganPage} />
+        <Route path="/asset" Component={AssetPage} />
         <Route path="/barang" Component={BarangPage} />
         <Route path="/barang-masuk" Component={BarangMasukPage} />
         <Route path="/barang-keluar" Component={BarangKeluarPage} />
+        <Route path="/pengajuan-perbaikan-asset" Component={PerbaikanAsset} />
         <Route path="/pengajuan-perbaikan" Component={PengajuanPerbaikan} />
         <Route path="/permintaan-barang" Component={BarangRuanganPage} />
         <Route path="/laporan-barang-masuk" Component={ReportBarangMasuk} />
@@ -53,10 +58,15 @@ const RouteIndex = () => {
           path="/laporan-permintaan-barang"
           Component={ReportPermintaanBarang}
         />
+
         <Route path="/laporan-barang-keluar" Component={ReportBarangKeluar} />
         <Route
           path="/laporan-pengajuan-perbaikan"
           Component={ReportPengajuanPerbaikan}
+        />
+        <Route
+          path="/laporan-perbaikan-asset"
+          Component={ReportPerbaikanAsset}
         />
         <Route path="/laporan-arsip-surat" Component={ReportArsiSurat} />
         <Route path="/laporan-surat-tugas" Component={ReportArsiSuratTugas} />

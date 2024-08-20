@@ -10,34 +10,46 @@ import Flatpickr from "react-flatpickr";
 import ReportPrint from "./print/ReportPrint";
 import ReactToPrint from "react-to-print";
 
-const ReportArsiSuratTugas = () => {
+const ReportPerbaikanAsset = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
 
   const columns: column[] = React.useMemo(
     () => [
       {
-        header: "Nomor Surat",
-        accessorKey: "nomor_surat",
+        header: "Nama",
+        accessorKey: "asset_id.name",
         enableColumnFilter: false,
-        enableSorting: true,
+        enableSorting: false,
       },
       {
-        header: "Pegawai",
-        accessorKey: "user_id.name",
+        header: "Tanggal Perbaikan",
+        accessorKey: "maintenance_date",
         enableColumnFilter: false,
-        enableSorting: true,
+        enableSorting: false,
       },
       {
-        header: "Keterangan",
-        accessorKey: "keterangan",
+        header: "Deskripsi",
+        accessorKey: "description",
         enableColumnFilter: false,
-        enableSorting: true,
+        enableSorting: false,
+      },
+      {
+        header: "Biaya Perbaikan",
+        accessorKey: "cost",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
+        header: "Jumlah",
+        accessorKey: "qty",
+        enableColumnFilter: false,
+        enableSorting: false,
       },
       {
         header: "Status",
         accessorKey: "status",
         enableColumnFilter: false,
-        enableSorting: true,
+        enableSorting: false,
       },
     ],
     []
@@ -54,19 +66,33 @@ const ReportArsiSuratTugas = () => {
 
   const [loadingV, setLoadingV] = useState(false);
 
-  const [jenisSurat, setJenisSurat] = useState("");
+  const [idKondisi, setIdKondisi] = useState<any>("");
+  const [kondisi, setKondisi] = useState([]);
+
+  const fetchDataKondisi = async () => {
+    try {
+      const response = await axiosInstance.get("/api/kondisi", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      setKondisi(response.data.data.data);
+    } catch (error) {
+      console.log("🚀 ~ fetchDataCategory= ~ error:", error);
+    }
+  };
 
   const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/surat-tugas", {
+      const userResponse = await axiosInstance.get("/api/maintenance-asset", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
         params: {
           start_date: startDate,
           end_date: endDate,
-          status: jenisSurat,
+          search: idKondisi,
         },
       });
       setData(userResponse.data.data.data);
@@ -90,11 +116,15 @@ const ReportArsiSuratTugas = () => {
 
   React.useEffect(() => {
     fetchDataBarangMasuk();
-  }, [startDate, endDate, jenisSurat]);
+    fetchDataKondisi();
+  }, [startDate, endDate, idKondisi]);
 
   return (
     <Layout>
-      <BreadCrumb title="Report Surat Tugas" pageTitle="Report Surat Tugas" />
+      <BreadCrumb
+        title="Report Perbaikan Asset"
+        pageTitle="Report Perbaikan Asset"
+      />
       <div className="card">
         <div className="card-body">
           <div className="flex gap-2 mb-4 justify-end">
@@ -103,13 +133,13 @@ const ReportArsiSuratTugas = () => {
               className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
               name="id_category"
               onChange={(e) => {
-                setJenisSurat(e.target.value);
+                setIdKondisi(e.target.value);
               }}
-              value={jenisSurat || "0"} // set default value
+              value={idKondisi || ""} // set default value
             >
-              <option value="0">Semua Status</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
+              <option value="">Semua Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Approve">Approve</option>
             </select>
             <div className="relative">
               {/* <button
@@ -118,6 +148,7 @@ const ReportArsiSuratTugas = () => {
               >
                 Pilih Tanggal
               </button> */}
+
               <div className="flex flex-row gap-2">
                 <Flatpickr
                   options={{
@@ -192,9 +223,9 @@ const ReportArsiSuratTugas = () => {
       </div>
 
       <div style={{ display: "none" }}>
-        <ReportPrint ref={printRef} title="Report Surat Tugas">
+        <ReportPrint ref={printRef} title="Report Perbaikan Asset">
           <TableContainer
-            isPagination={false} // Remove pagination for print
+            isPagination={false}
             isTfoot={false}
             isSelect={false}
             isGlobalFilter={false}
@@ -209,13 +240,12 @@ const ReportArsiSuratTugas = () => {
                 };
               }) || []
             }
-            customPageSize={data.length}
-            divclassName="my-2 col-span-12 overflow-x-auto lg:col-span-12"
-            tableclassName="display dataTable w-full text-sm align-middle whitespace-normal" 
+            divclassName="my-2 col-span-12 overflow-x-auto lg:col-span-12 border border-gray-300"
+            tableclassName="display dataTable w-full text-sm align-middle whitespace-nowrap"
             theadclassName="border-b border-slate-200 dark:border-zink-500"
             trclassName="group-[.stripe]:even:bg-slate-50 group-[.stripe]:dark:even:bg-zink-600 transition-all duration-150 ease-linear group-[.hover]:hover:bg-slate-50 dark:group-[.hover]:hover:bg-zink-600 [&.selected]:bg-custom-500 dark:[&.selected]:bg-custom-500 [&.selected]:text-custom-50 dark:[&.selected]:text-custom-50"
             thclassName="p-3 group-[.bordered]:border group-[.bordered]:border-slate-200 group-[.bordered]:dark:border-zink-500 sorting px-3 py-4 text-slate-900 bg-slate-200/50 font-semibold text-left dark:text-zink-50 dark:bg-zink-600 dark:group-[.bordered]:border-zink-500"
-            tdclassName="p-3 group-[.bordered]:border group-[.bordered]:border-slate-200 group-[.bordered]:dark:border-zink-500 whitespace-normal" // Change to whitespace-normal
+            tdclassName="p-3 group-[.bordered]:border group-[.bordered]:border-slate-200 group-[.bordered]:dark:border-zink-500"
             PaginationClassName="flex flex-col items-center mt-5 md:flex-row"
           />
         </ReportPrint>
@@ -224,4 +254,4 @@ const ReportArsiSuratTugas = () => {
   );
 };
 
-export default ReportArsiSuratTugas;
+export default ReportPerbaikanAsset;
