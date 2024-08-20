@@ -16,6 +16,12 @@ const ReportBarangMasuk = () => {
   const columns: column[] = React.useMemo(
     () => [
       {
+        header: "Kode Barang",
+        accessorKey: "code_barang",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
         header: "Nama",
         accessorKey: "nama",
         enableColumnFilter: false,

@@ -55,6 +55,7 @@ const BarangMasukPage = () => {
     initialValues: {
       id: (eventData && eventData.id) || "",
       nama: (eventData && eventData.nama) || "",
+      code_barang: (eventData && eventData.code_barang) || "",
       merk: (eventData && eventData.merk) || "",
       id_category: (eventData && eventData.id_category.id) || "",
       id_kondisi: (eventData && eventData.id_kondisi.id) || "",
@@ -66,6 +67,7 @@ const BarangMasukPage = () => {
     },
     validationSchema: Yup.object({
       nama: Yup.string().required("Nama Barang harus diisi!"),
+      code_barang: Yup.string().required("Code Barang harus diisi!"),
       merk: Yup.string().required("Merk harus diisi!"),
       id_category: Yup.string().required("Kategori harus diisi!"),
       id_kondisi: Yup.string().required("Kondisi harus diisi!"),
@@ -106,8 +108,8 @@ const BarangMasukPage = () => {
   const columns = useMemo(
     () => [
       {
-        header: "No",
-        accessorKey: "no",
+        header: "Kode Barang",
+        accessorKey: "code_barang",
         enableColumnFilter: false,
       },
       {
@@ -231,6 +233,7 @@ const BarangMasukPage = () => {
       setIsLoading(true);
       const formData = new FormData();
       formData.append("nama", data.nama);
+      formData.append("code_barang", data.code_barang);
       formData.append("merk", data.merk);
       formData.append("id_category", data.id_category);
       formData.append("id_kondisi", data.id_kondisi);
@@ -272,6 +275,7 @@ const BarangMasukPage = () => {
       setIsLoading(true);
       const formData = new FormData();
       formData.append("nama", data.nama);
+      formData.append("code_barang", data.code_barang);
       formData.append("merk", data.merk);
       formData.append("id_category", data.id_category);
       formData.append("id_kondisi", data.id_kondisi);
@@ -509,6 +513,29 @@ const BarangMasukPage = () => {
               className="hidden px-4 py-3 text-sm text-red-500 border border-transparent rounded-md bg-red-50 dark:bg-red-500/20"
             ></div>
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="code_barang"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  Kode Barang
+                </label>
+                <input
+                  type="text"
+                  id="code_barang"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Kode Barang"
+                  name="code_barang"
+                  onChange={validation.handleChange}
+                  value={validation.values.code_barang || ""}
+                />
+                {validation.touched.code_barang &&
+                validation.errors.code_barang ? (
+                  <p className="text-red-400">
+                    {validation.errors.code_barang}
+                  </p>
+                ) : null}
+              </div>
               <div className="xl:col-span-12">
                 <label
                   htmlFor="nama_barang"
