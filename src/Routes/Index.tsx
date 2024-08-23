@@ -27,6 +27,8 @@ import ReportBarangKabag from "report/ReportBarangKabag";
 import AssetPage from "pages/Asset/AssetPage";
 import PerbaikanAsset from "pages/PerbaikanAsset/PerbaikanAsset";
 import ReportPerbaikanAsset from "report/PerbaikanAsset";
+import AssetBarangPage from "pages/AssetBarang/AssetBarangPage";
+import LaporanAssetBarangPage from "report/LaporanAssetBarang";
 
 const RouteIndex = () => {
   return (
@@ -41,6 +43,11 @@ const RouteIndex = () => {
         <Route path="/ruangan" Component={RuanganPage} />
         <Route path="/asset" Component={AssetPage} />
         <Route path="/barang" Component={BarangPage} />
+        <Route path="/asset-barang" Component={AssetBarangPage} />
+        <Route
+          path="/laporan-barang-asset"
+          Component={LaporanAssetBarangPage}
+        />
         <Route path="/barang-masuk" Component={BarangMasukPage} />
         <Route path="/barang-keluar" Component={BarangKeluarPage} />
         <Route path="/pengajuan-perbaikan-asset" Component={PerbaikanAsset} />

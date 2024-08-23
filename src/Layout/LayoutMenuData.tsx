@@ -110,6 +110,12 @@ const menuData: any = [
   //   link: "/barang",
   // },
   {
+    id: "Asset / Barang",
+    label: "Asset / Barang",
+    icon: <PackagePlus />,
+    link: "/asset-barang",
+  },
+  {
     id: "Asset",
     label: "Asset",
     icon: <PackagePlus />,
@@ -178,8 +184,14 @@ const menuData: any = [
     link: "/laporan-surat-berkelakuan-baik",
   },
   {
-    label: "Laporan Barang",
+    label: "Laporan Barang / Asset",
     isTitle: true,
+  },
+  {
+    id: "Laporan Barang / Asset",
+    label: "Barang / Asset",
+    icon: <FileLineChart />,
+    link: "/laporan-barang-asset",
   },
   {
     id: "Laporan Barang Masuk",

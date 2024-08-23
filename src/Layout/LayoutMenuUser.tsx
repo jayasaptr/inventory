@@ -81,21 +81,21 @@ const menuUser: any = [
     link: "/surat-berkelakuan-baik",
   },
   {
-    id: "Pengarsipan Surat",
-    label: "Pengarsipan Surat",
-    icon: <Mail />,
-    link: "/pengarsipan-surat",
-  },
-  {
-    label: "Data Barang",
+    label: "Data Barang / Asset",
     isTitle: true,
   },
   {
-    id: "Barang Masuk",
-    label: "Barang Masuk",
+    id: "Asset / Barang",
+    label: "Asset / Barang",
     icon: <PackagePlus />,
-    link: "/barang-masuk",
+    link: "/asset-barang",
   },
+  // {
+  //   id: "Barang Masuk",
+  //   label: "Barang Masuk",
+  //   icon: <PackagePlus />,
+  //   link: "/barang-masuk",
+  // },
   {
     label: "Data Lainnya",
     isTitle: true,

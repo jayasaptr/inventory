@@ -55,6 +55,8 @@ const AssetPage = () => {
     initialValues: {
       id: (eventData && eventData.id) || "",
       name: (eventData && eventData.name) || "",
+      code: (eventData && eventData.code) || "",
+      kondisi: (eventData && eventData.kondisi) || "",
       description: (eventData && eventData.description) || "",
       purchase_date: (eventData && eventData.purchase_date) || "",
       type: (eventData && eventData.type) || "",
@@ -63,6 +65,8 @@ const AssetPage = () => {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Nama Barang is Required"),
+      code: Yup.string().required("Code is Required"),
+      kondisi: Yup.string().required("Kondisi is Required"),
       description: Yup.string().required("Description is Required"),
       purchase_date: Yup.string().required("Purchase Date is Required"),
       type: Yup.string().required("Type is Required"),
@@ -107,6 +111,18 @@ const AssetPage = () => {
       {
         header: "Nama Asset",
         accessorKey: "name",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
+        header: "Kode Asset",
+        accessorKey: "code",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
+        header: "Kondisi",
+        accessorKey: "kondisi",
         enableColumnFilter: false,
         enableSorting: false,
       },
@@ -206,6 +222,8 @@ const AssetPage = () => {
       setIsLoading(true);
       const formData = new FormData();
       formData.append("name", data.name);
+      formData.append("code", data.code);
+      formData.append("kondisi", data.kondisi);
       formData.append("description", data.description);
       formData.append("purchase_date", data.purchase_date);
       formData.append("type", data.type);
@@ -220,12 +238,12 @@ const AssetPage = () => {
       });
 
       if (userResponse.data.success === true) {
-        Success("Data Barang Masuk Berhasil Ditambahkan");
+        Success("Data Asset Masuk Berhasil Ditambahkan");
         fetchDataBarangMasuk();
         toggle();
       }
     } catch (error: any) {
-      Error("Data Barang Masuk Gagal Ditambahkan");
+      Error("Data Asset Masuk Gagal Ditambahkan");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -240,6 +258,8 @@ const AssetPage = () => {
       setIsLoading(true);
       const formData = new FormData();
       formData.append("name", data.name);
+      formData.append("code", data.code);
+      formData.append("kondisi", data.kondisi);
       formData.append("description", data.description);
       formData.append("purchase_date", data.purchase_date);
       formData.append("type", data.type);
@@ -258,12 +278,12 @@ const AssetPage = () => {
       );
 
       if (userResponse.data.success === true) {
-        Success("Data Barang Masuk Berhasil Diupdate");
+        Success("Data Asset Masuk Berhasil Diupdate");
         fetchDataBarangMasuk();
         toggle();
       }
     } catch (error: any) {
-      Error("Data Barang Masuk Gagal Diupdate");
+      Error("Data Asset Masuk Gagal Diupdate");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -283,11 +303,11 @@ const AssetPage = () => {
       });
 
       if (userResponse.data.success === true) {
-        Success("Data Barang Masuk Berhasil Dihapus");
+        Success("Data Asset Masuk Berhasil Dihapus");
         fetchDataBarangMasuk();
       }
     } catch (error: any) {
-      Error("Data Barang Masuk Gagal Dihapus");
+      Error("Data Asset Masuk Gagal Dihapus");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -329,7 +349,7 @@ const AssetPage = () => {
 
   return (
     <Layout>
-      <BreadCrumb title="Data Barang" pageTitle="Barang" />
+      <BreadCrumb title="Data Asset" pageTitle="Barang" />
       <DeleteModal
         show={deleteModal}
         onHide={deleteToggle}
@@ -436,6 +456,26 @@ const AssetPage = () => {
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
                 <label
+                  htmlFor="code"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  Kode Asset
+                </label>
+                <input
+                  type="text"
+                  id="code"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Kode Asset"
+                  name="code"
+                  onChange={validation.handleChange}
+                  value={validation.values.code || ""}
+                />
+                {validation.touched.code && validation.errors.code ? (
+                  <p className="text-red-400">{validation.errors.code}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
                   htmlFor="name"
                   className="inline-block mb-2 text-base font-medium"
                 >
@@ -452,6 +492,26 @@ const AssetPage = () => {
                 />
                 {validation.touched.name && validation.errors.name ? (
                   <p className="text-red-400">{validation.errors.name}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="kondisi"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  Kondisi Asset
+                </label>
+                <input
+                  type="text"
+                  id="kondisi"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Kondisi Asset"
+                  name="kondisi"
+                  onChange={validation.handleChange}
+                  value={validation.values.kondisi || ""}
+                />
+                {validation.touched.kondisi && validation.errors.kondisi ? (
+                  <p className="text-red-400">{validation.errors.kondisi}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
