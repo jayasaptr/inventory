@@ -69,6 +69,12 @@ const menuUser: any = [
     isTitle: true,
   },
   {
+    id: "Surat Tugas",
+    label: "Surat Tugas",
+    icon: <Mail />,
+    link: "/surat-tugas",
+  },
+  {
     id: "Surat Keterangan Aktif",
     label: "Surat Keterangan Aktif",
     icon: <Mail />,
