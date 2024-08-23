@@ -215,14 +215,14 @@ const PengajuanPerbaikan = () => {
                 className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
                 onClick={() => {
                   const data = cell.row.original;
-                  if (user.user.role === "admin" || user.user.role == "staf") {
+                  if (user.user.role === "admin") {
                     updateStatus(data.id);
                   } else {
                     onClickDelete(data);
                   }
                 }}
               >
-                {user.user.role === "admin" || user.user.role == "staf" ? (
+                {user.user.role === "admin" ? (
                   <Check className="size-4" />
                 ) : (
                   <Trash2 className="size-4" />

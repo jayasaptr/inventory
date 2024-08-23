@@ -2,16 +2,7 @@ import BreadCrumb from "Common/BreadCrumb";
 import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastContainer, ToastPosition, toast } from "react-toastify";
-import {
-  ImagePlus,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-  Check,
-  BookMarked,
-  ClipboardList,
-} from "lucide-react";
+import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 // Formik
 import * as Yup from "yup";
@@ -21,7 +12,7 @@ import Modal from "Common/Components/Modal";
 import { axiosInstance } from "lib/axios";
 import Layout from "Layout";
 
-const BarangRuanganPage = () => {
+const AssetKeluar = () => {
   const [data, setData] = useState<any>([]);
   const [eventData, setEventData] = useState<any>();
   const [id, setId] = useState<number>(0);
@@ -34,34 +25,16 @@ const BarangRuanganPage = () => {
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const deleteToggle = () => setDeleteModal(!deleteModal);
 
-  // Image
-  const [selectedImage, setSelectedImage] = useState<any>();
-
-  const handleImageChange = (event: any) => {
-    const fileInput = event.target;
-    if (fileInput.files && fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        validation.setFieldValue("kwitansi", file);
-        setSelectedImage(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // Delete Data
-  const onClickDelete = (cell: any) => {
+  const onClickDelete = (cell: number) => {
     setDeleteModal(true);
-    // setId(cell);
-    if (cell.id) {
-      setEventData(cell);
-    }
+    setId(cell);
   };
 
   const handleDelete = () => {
-    if (eventData) {
-      handleDeleteDataBarangMasuk(eventData.id);
+    console.log("🚀 ~ handleDelete ~ eventData:", id);
+    if (id) {
+      handleDeleteDataAssetMasuk(id);
       setDeleteModal(false);
     }
   };
@@ -80,40 +53,34 @@ const BarangRuanganPage = () => {
     enableReinitialize: true,
 
     initialValues: {
-      id: (eventData && eventData.id) || "",
-      id_barang_masuk: (eventData && eventData.id_barang_masuk.id) || "",
-      id_ruangan: (eventData && eventData.id_ruangan.id) || "",
+      // id: (eventData && eventData.id) || "",
+      id_asset: (eventData && eventData.id_asset.id) || "",
+      kondisi: (eventData && eventData.kondisi.id) || "",
       jumlah: (eventData && eventData.jumlah) || "",
+      penerima: (eventData && eventData.penerima) || "",
+      tanggal_keluar: (eventData && eventData.tanggal_keluar) || "",
       keterangan: (eventData && eventData.keterangan) || "",
     },
     validationSchema: Yup.object({
-      id_barang_masuk: Yup.string().required("Pilih Barang"),
-      id_ruangan: Yup.string().required("Pilih Ruangan"),
-      jumlah: Yup.number().required("Jumlah harus diisi"),
+      id_asset: Yup.string().required("Pilih Asset"),
+      kondisi: Yup.string().required("Pilih Kondisi"),
+      jumlah: Yup.string().required("Jumlah harus diisi"),
+      penerima: Yup.string().required("Penerima harus diisi"),
+      tanggal_keluar: Yup.string().required("Tanggal Keluar harus diisi"),
       keterangan: Yup.string().required("Keterangan harus diisi"),
     }),
 
     onSubmit: (values) => {
-      console.log("🚀 ~ PengajuanPerbaikan ~ values:", values);
+      console.log("🚀 ~ AssetPage ~ values:", values);
       if (isEdit) {
       } else {
-        handlePostPermintaan(values);
+        handlePostAssetKeluar(values);
       }
       if (isLoading) {
         toggle();
       }
     },
   });
-
-  //   show image with modal
-  const [showImage, setShowImage] = useState(false);
-
-  const [image, setImage] = useState("");
-
-  const handleShowImage = (image: string) => {
-    setImage(image);
-    setShowImage(true);
-  };
 
   //
   const toggle = useCallback(() => {
@@ -128,8 +95,6 @@ const BarangRuanganPage = () => {
     }
   }, [show, validation]);
 
-  const user = JSON.parse(localStorage.getItem("authUser")!);
-
   // columns
   const columns = useMemo(
     () => [
@@ -140,12 +105,12 @@ const BarangRuanganPage = () => {
       },
       {
         header: "Nama",
-        accessorKey: "id_barang_masuk.nama",
+        accessorKey: "id_asset.name",
         enableColumnFilter: false,
       },
       {
-        header: "Merk",
-        accessorKey: "id_barang_masuk.merk",
+        header: "Penerima",
+        accessorKey: "penerima",
         enableColumnFilter: false,
       },
       {
@@ -154,23 +119,18 @@ const BarangRuanganPage = () => {
         enableColumnFilter: false,
       },
       {
+        header: "Tanggal Keluar",
+        accessorKey: "tanggal_keluar",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Kondisi",
+        accessorKey: "kondisi",
+        enableColumnFilter: false,
+      },
+      {
         header: "Keterangan",
         accessorKey: "keterangan",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Ruangan",
-        accessorKey: "id_ruangan.nama",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Status",
-        accessorKey: "status",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Tanggal Permintaan",
-        accessorKey: "tanggal",
         enableColumnFilter: false,
       },
       {
@@ -179,26 +139,16 @@ const BarangRuanganPage = () => {
         enableSorting: true,
         cell: (cell: any) => (
           <div className="flex gap-3">
-            {cell.row.original.status === "disetuji" ? null : (
-              <Link
-                to="#!"
-                className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
-                onClick={() => {
-                  const data = cell.row.original;
-                  if (user.user.role === "admin") {
-                    updateStatus(data.id);
-                  } else {
-                    onClickDelete(data);
-                  }
-                }}
-              >
-                {user.user.role === "admin" ? (
-                  <Check className="size-4" />
-                ) : (
-                  <Trash2 className="size-4" />
-                )}
-              </Link>
-            )}
+            <Link
+              to="#!"
+              className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
+              onClick={() => {
+                const data = cell.row.original;
+                onClickDelete(data.id);
+              }}
+            >
+              <Trash2 className="size-4" />
+            </Link>
           </div>
         ),
       },
@@ -206,24 +156,18 @@ const BarangRuanganPage = () => {
     []
   );
 
+  const user = JSON.parse(localStorage.getItem("authUser")!);
+
   const naviagate = useNavigate();
 
-  const fetchDataBarangRuangan = async () => {
+  const fetchDataAssetKeluar = async () => {
     setLoadingV(true);
-    const userQuery = "api/barang-ruangan?search=" + user.user.id;
-    const adminQuery = "api/barang-ruangan";
-
     try {
-      const userResponse = await axiosInstance.get(
-        user.user.role === "admin" || user.user.role === "staf"
-          ? adminQuery
-          : userQuery,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+      const userResponse = await axiosInstance.get("/api/asset-keluar", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
       setData(userResponse.data.data.data);
     } catch (error: any) {
       if (error.response.status === 401) {
@@ -235,14 +179,11 @@ const BarangRuanganPage = () => {
     }
   };
 
-  //update status by admin
-  const updateStatus = async (id: number) => {
-    const formData = new FormData();
-    formData.append("status", "disetuji");
+  const handleDeleteDataAssetMasuk = async (id: any) => {
     try {
-      const response = await axiosInstance.post(
-        `/api/barang-ruangan/${id}`,
-        formData,
+      setIsLoading(true);
+      const userResponse = await axiosInstance.delete(
+        `/api/asset-keluar/${id}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -250,12 +191,32 @@ const BarangRuanganPage = () => {
         }
       );
 
-      if (response.data.success === true) {
-        Success("Status Perbaikan Berhasil Diupdate");
-        fetchDataBarangRuangan();
+      if (userResponse.data.success === true) {
+        Success("Data Asset Keluar Berhasil Dihapus");
+        fetchDataAssetKeluar();
       }
     } catch (error: any) {
-      Error("Status Perbaikan Gagal Diupdate");
+      Error("Data Asset Keluar Gagal Dihapus");
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const [kondisi, setKondisi] = useState<any>([]);
+
+  const fetchDataKondisi = async () => {
+    try {
+      const response = await axiosInstance.get("/api/kondisi", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      setKondisi(response.data.data.data);
+    } catch (error: any) {
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -263,20 +224,28 @@ const BarangRuanganPage = () => {
     }
   };
 
-  const handlePostPermintaan = async (data: any) => {
+  const [Asset, setAsset] = useState<any>([]);
+
+  const handlePostAssetKeluar = async (data: any) => {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("id_barang_masuk", data.id_barang_masuk);
-      formData.append("id_ruangan", data.id_ruangan);
+
+      if (user.user.role === "admin") {
+        formData.append("id_asset", data.id_asset);
+      } else {
+        const dataAsset = JSON.parse(data.id_asset);
+        formData.append("id_Asset_ruang", dataAsset.id);
+        formData.append("id_asset", dataAsset.id_asset.id);
+      }
+      formData.append("kondisi", data.kondisi);
       formData.append("jumlah", data.jumlah);
+      formData.append("penerima", data.penerima);
+      formData.append("tanggal_keluar", data.tanggal_keluar);
       formData.append("keterangan", data.keterangan);
-      formData.append("id_user", user.user.id);
-      formData.append("tanggal", new Date().toISOString().split("T")[0]);
-      formData.append("status", "diproses");
 
       const userResponse = await axiosInstance.post(
-        "/api/barang-ruangan",
+        "/api/asset-keluar",
         formData,
         {
           headers: {
@@ -287,12 +256,12 @@ const BarangRuanganPage = () => {
       );
 
       if (userResponse.data.success === true) {
-        Success("Data Barang Keluar Berhasil Ditambahkan");
-        fetchDataBarangRuangan();
+        Success("Data Asset Keluar Berhasil Ditambahkan");
+        fetchDataAssetKeluar();
         toggle();
       }
     } catch (error: any) {
-      Error("Data Barang Keluar Gagal Ditambahkan");
+      Error("Data Asset Keluar Gagal Ditambahkan");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -302,74 +271,14 @@ const BarangRuanganPage = () => {
     }
   };
 
-  const handleDeleteDataBarangMasuk = async (id: any) => {
+  const fetchDataAsset = async () => {
     try {
-      setIsLoading(true);
-      const userResponse = await axiosInstance.delete(
-        `/api/barang-ruangan/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      if (userResponse.data.success === true) {
-        Success("Barang Berhasil Dihapus");
-        fetchDataBarangRuangan();
-      }
-    } catch (error: any) {
-      Error("Barang Gagal Dihapus");
-      if (error.response.status === 401) {
-        localStorage.removeItem("authUser");
-        naviagate("/login");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const [barang, setBarang] = useState<any>([]);
-
-  const fetchDataBarang = async () => {
-    try {
-      const response = await axiosInstance.get("/api/barang-masuk", {
+      const response = await axiosInstance.get("/api/asset", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      setBarang(response.data.data.data);
-    } catch (error: any) {
-      if (error.response.status === 401) {
-        localStorage.removeItem("authUser");
-        naviagate("/login");
-      }
-    }
-  };
-
-  const [ruangan, setRuangan] = useState<any>([]);
-
-  const fetchDataRuanganByUserId = async () => {
-    const idUser = user.user.id;
-    try {
-      if (user.user.role === "kabag") {
-        const response = await axiosInstance.get(
-          `/api/ruangan-user?id_user=${idUser}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-        setRuangan(response.data.data);
-      } else {
-        const response = await axiosInstance.get(`/api/ruangan`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-        setRuangan(response.data.data.data);
-      }
+      setAsset(response.data.data.data);
     } catch (error: any) {
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
@@ -379,9 +288,9 @@ const BarangRuanganPage = () => {
   };
 
   useEffect(() => {
-    fetchDataRuanganByUserId();
-    fetchDataBarangRuangan();
-    fetchDataBarang();
+    fetchDataAssetKeluar();
+    fetchDataKondisi();
+    fetchDataAsset();
   }, []);
 
   const [loadingV, setLoadingV] = useState(false);
@@ -412,10 +321,7 @@ const BarangRuanganPage = () => {
 
   return (
     <Layout>
-      <BreadCrumb
-        title="Data Permintaan Barang"
-        pageTitle="Permintaan Barang"
-      />
+      <BreadCrumb title="Data Asset" pageTitle="Asset" />
       <DeleteModal
         show={deleteModal}
         onHide={deleteToggle}
@@ -428,49 +334,25 @@ const BarangRuanganPage = () => {
         onHide={deleteToggle}
         onDelete={handleDelete}
       />
-
-      {/* Modal show image */}
-      <Modal
-        show={showImage}
-        onHide={() => setShowImage(false)}
-        modal-center="true"
-        className="fixed flex flex-col transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4"
-        dialogClassName="w-screen md:w-[30rem] bg-white shadow rounded-md dark:bg-zink-600"
-      >
-        <Modal.Header
-          className="flex items-center justify-between p-4 border-b dark:border-zink-500"
-          closeButtonClass="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500"
-        >
-          <Modal.Title className="text-16">Kwitansi</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
-          <div className="flex justify-center">
-            <img src={image} alt="" className="h-96" />
-          </div>
-        </Modal.Body>
-      </Modal>
-
       <ToastContainer closeButton={false} limit={1} />
       <div className="card" id="employeeTable">
         <div className="card-body">
           <div className="flex items-center gap-3 mb-4">
             <h6 className="text-15 grow">
-              Permintaan (<b className="total-Employs">{data.length}</b>)
+              Asset (<b className="total-Employs">{data.length}</b>)
             </h6>
-            {user.user.role === "admin" ? null : (
-              <div className="shrink-0">
-                <Link
-                  to="#!"
-                  data-modal-target="addEmployeeModal"
-                  type="button"
-                  className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee"
-                  onClick={toggle}
-                >
-                  <Plus className="inline-block size-4" />{" "}
-                  <span className="align-middle">Ajukan Permintaan</span>
-                </Link>
-              </div>
-            )}
+            <div className="shrink-0">
+              <Link
+                to="#!"
+                data-modal-target="addEmployeeModal"
+                type="button"
+                className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee"
+                onClick={toggle}
+              >
+                <Plus className="inline-block size-4" />{" "}
+                <span className="align-middle">Add Asset Keluar</span>
+              </Link>
+            </div>
           </div>
           {data && data.length > 0 ? (
             // for no get from 1 index
@@ -522,7 +404,7 @@ const BarangRuanganPage = () => {
           closeButtonClass="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500"
         >
           <Modal.Title className="text-16">
-            {!!isEdit ? "Edit Barang" : "Ajukan Permintaan"}
+            {!!isEdit ? "Edit Asset" : "Add Asset Masuk"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
@@ -546,72 +428,74 @@ const BarangRuanganPage = () => {
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="id_barang_masuk"
+                  htmlFor="id_Asset"
                   className="inline-block mb-2 text-base font-medium"
                 >
-                  Pilih Barang
+                  Pilih Asset
                 </label>
                 <select
-                  id="id_barang_masuk"
+                  id="id_Asset"
                   className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_barang_masuk"
+                  name="id_asset"
                   onChange={(e) => {
+                    // const datas = JSON.parse(e.target.value);
                     validation.handleChange(e);
-                    validation.setFieldValue("id_barang_masuk", e.target.value);
+                    validation.setFieldValue("id_asset", e.target.value);
+                    // if (user.user.role === "admin") {
+                    //   validation.setFieldValue("id_Asset", e.target.value);
+                    // } else {
+                    //   validation.setFieldValue("id_Asset", datas.id);
+                    //   validation.setFieldValue(
+                    //     "id_Asset_user",
+                    //     datas.id_Asset_masuk.id
+                    //   );
+                    // }
                   }}
                   onBlur={validation.handleBlur}
                   value={
-                    validation.values.id_barang_masuk ||
-                    (eventData && eventData.id_barang_masuk.id) ||
+                    validation.values.id_asset ||
+                    (eventData && eventData.id_asset.id) ||
                     ""
                   }
                 >
-                  <option value="">Pilih Barang</option>
-                  {barang.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
+                  <option value="">Pilih Asset</option>
+                  {Asset.map((item: any, index: number) => (
+                    <option
+                      key={index}
+                      value={
+                        user.user.role === "admin"
+                          ? item.id
+                          : JSON.stringify(item)
+                      }
+                    >
+                      {user.user.role === "admin"
+                        ? item.name
+                        : item.id_asset.nama}
                     </option>
                   ))}
                 </select>
-                {validation.touched.id_barang_masuk &&
-                validation.errors.id_barang_masuk ? (
-                  <p className="text-red-400">
-                    {validation.errors.id_barang_masuk}
-                  </p>
+                {validation.touched.id_asset && validation.errors.id_asset ? (
+                  <p className="text-red-400">{validation.errors.id_asset}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="id_ruangan"
-                  className="inline-block mb-2 text-base font-medium"
+                  htmlFor="kondisi"
+                  className="inline-block mb-2 text-balance font-medium"
                 >
-                  Pilih Ruangan
+                  Kondisi
                 </label>
-                <select
-                  id="id_ruangan"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_ruangan"
-                  onChange={(e) => {
-                    validation.handleChange(e);
-                    validation.setFieldValue("id_ruangan", e.target.value);
-                  }}
-                  onBlur={validation.handleBlur}
-                  value={
-                    validation.values.id_ruangan ||
-                    (eventData && eventData.id_ruangan.id) ||
-                    ""
-                  }
-                >
-                  <option value="">Pilih Ruangan</option>
-                  {ruangan.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
-                    </option>
-                  ))}
-                </select>
-                {validation.touched.id_ruangan &&
-                validation.errors.id_ruangan ? (
-                  <p className="text-red-400">{validation.errors.id_ruangan}</p>
+                <input
+                  type="text"
+                  id="kondisi"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Kondisi"
+                  name="kondisi"
+                  onChange={validation.handleChange}
+                  value={validation.values.kondisi || ""}
+                />
+                {validation.touched.kondisi && validation.errors.kondisi ? (
+                  <p className="text-red-400">{validation.errors.kondisi}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
@@ -632,6 +516,49 @@ const BarangRuanganPage = () => {
                 />
                 {validation.touched.jumlah && validation.errors.jumlah ? (
                   <p className="text-red-400">{validation.errors.jumlah}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="penerima"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Penerima
+                </label>
+                <input
+                  type="text"
+                  id="penerima"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Penerima"
+                  name="penerima"
+                  onChange={validation.handleChange}
+                  value={validation.values.penerima || ""}
+                />
+                {validation.touched.penerima && validation.errors.penerima ? (
+                  <p className="text-red-400">{validation.errors.penerima}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="tanggal_keluar"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Tanggal Keluar
+                </label>
+                <input
+                  type="date"
+                  id="tanggal_keluar"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Tanggal Keluar"
+                  name="tanggal_keluar"
+                  onChange={validation.handleChange}
+                  value={validation.values.tanggal_keluar || ""}
+                />
+                {validation.touched.tanggal_keluar &&
+                validation.errors.tanggal_keluar ? (
+                  <p className="text-red-400">
+                    {validation.errors.tanggal_keluar}
+                  </p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
@@ -672,7 +599,11 @@ const BarangRuanganPage = () => {
                 disabled={isLoading}
                 className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
               >
-                {isLoading ? "Loading" : !!isEdit ? "Update" : "Add Permintaan"}
+                {isLoading
+                  ? "Loading"
+                  : !!isEdit
+                  ? "Update"
+                  : "Add Asset Keluar"}
               </button>
             </div>
           </form>
@@ -682,4 +613,4 @@ const BarangRuanganPage = () => {
   );
 };
 
-export default BarangRuanganPage;
+export default AssetKeluar;
