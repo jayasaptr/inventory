@@ -202,8 +202,8 @@ const ReportArsiSurat = () => {
       <div style={{ display: "none" }}>
         <ReportPrint ref={printRef} title="Report Arsip Surat">
         <TableContainer
-              isPagination={true}
-              isTfoot={true}
+              isPagination={false}
+              isTfoot={false}
               isSelect={false}
               isGlobalFilter={false}
               columns={columns || []}
