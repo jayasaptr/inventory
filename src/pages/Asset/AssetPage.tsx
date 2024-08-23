@@ -62,6 +62,7 @@ const AssetPage = () => {
       type: (eventData && eventData.type) || "",
       price: (eventData && eventData.price) || "",
       quantity: (eventData && eventData.quantity) || "",
+      satuan: (eventData && eventData.satuan) || "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Nama Barang is Required"),
@@ -72,6 +73,7 @@ const AssetPage = () => {
       type: Yup.string().required("Type is Required"),
       price: Yup.number().required("Price is Required"),
       quantity: Yup.number().required("Quantity is Required"),
+      satuan: Yup.string().required("Satuan is Required"),
     }),
 
     onSubmit: (values) => {
@@ -157,6 +159,12 @@ const AssetPage = () => {
         enableSorting: false,
       },
       {
+        header: "Satuan",
+        accessorKey: "satuan",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
         header: "Action",
         enableColumnFilter: false,
         enableSorting: false,
@@ -229,6 +237,7 @@ const AssetPage = () => {
       formData.append("type", data.type);
       formData.append("price", data.price);
       formData.append("quantity", data.quantity);
+      formData.append("satuan", data.satuan);
 
       const userResponse = await axiosInstance.post("/api/asset", formData, {
         headers: {
@@ -265,6 +274,7 @@ const AssetPage = () => {
       formData.append("type", data.type);
       formData.append("price", data.price);
       formData.append("quantity", data.quantity);
+      formData.append("satuan", data.satuan);
 
       const userResponse = await axiosInstance.post(
         `/api/asset/${data.id}`,
@@ -530,7 +540,9 @@ const AssetPage = () => {
                   value={validation.values.type || ""}
                 >
                   <option value="">Select Type</option>
-                  <option value="Asset Tetap">Asset Tetap</option>
+                  <option value="Asset Tidak Bergerak">
+                    Asset Tidak Bergerak
+                  </option>
                   <option value="Asset Bergerak">Asset Bergerak</option>
                 </select>
                 {validation.touched.type && validation.errors.type ? (
@@ -621,6 +633,26 @@ const AssetPage = () => {
                 />
                 {validation.touched.quantity && validation.errors.quantity ? (
                   <p className="text-red-400">{validation.errors.quantity}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="satuan"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Satuan
+                </label>
+                <input
+                  type="text"
+                  id="satuan"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Satuan"
+                  name="satuan"
+                  onChange={validation.handleChange}
+                  value={validation.values.satuan || ""}
+                />
+                {validation.touched.satuan && validation.errors.satuan ? (
+                  <p className="text-red-400">{validation.errors.satuan}</p>
                 ) : null}
               </div>
             </div>
