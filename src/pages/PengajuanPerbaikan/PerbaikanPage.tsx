@@ -470,7 +470,7 @@ const PengajuanPerbaikan = () => {
             <h6 className="text-15 grow">
               Perbaikan (<b className="total-Employs">{data.length}</b>)
             </h6>
-            {user.user.role === "admin" ? null : (
+            {/* {user.user.role === "admin" ? null : (
               <div className="shrink-0">
                 <Link
                   to="#!"
@@ -483,7 +483,19 @@ const PengajuanPerbaikan = () => {
                   <span className="align-middle">Ajukan Perbaikan</span>
                 </Link>
               </div>
-            )}
+            )} */}
+            <div className="shrink-0">
+              <Link
+                to="#!"
+                data-modal-target="addEmployeeModal"
+                type="button"
+                className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee"
+                onClick={toggle}
+              >
+                <Plus className="inline-block size-4" />{" "}
+                <span className="align-middle">Ajukan Perbaikan</span>
+              </Link>
+            </div>
           </div>
           {data && data.length > 0 ? (
             // for no get from 1 index

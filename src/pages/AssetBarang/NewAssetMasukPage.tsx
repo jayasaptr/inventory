@@ -548,8 +548,10 @@ const NewAssetMasukPage = () => {
                   }
                 >
                   <option value="">Pilih Kategori</option>
-                  <option value="Asset Tetap">Asset Tetap</option>
-                  <option value="Asset Tidak Tetap">Asset Tidak Tetap</option>
+                  <option value="Aset Bergerak">Aset Bergerak</option>
+                  <option value="Aset Tidak Bergerak">
+                    Aset Tidak Bergerak
+                  </option>
                 </select>
                 {validation.touched.category && validation.errors.category ? (
                   <p className="text-red-400">{validation.errors.category}</p>

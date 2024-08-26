@@ -110,11 +110,6 @@ const AssetBarangPage = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Tanggal Pembelian / Tanggal Masuk",
-        accessorKey: "tanggal_pembelian",
-        enableColumnFilter: false,
-      },
-      {
         header: "Jumlah",
         accessorKey: "jumlah",
         enableColumnFilter: false,
@@ -250,8 +245,6 @@ const AssetBarangPage = () => {
       setIsLoading(false);
     }
   };
-
-  
 
   useEffect(() => {
     fetchDataBarang();

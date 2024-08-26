@@ -28,12 +28,6 @@ const LaporanAssetBarang = () => {
         enableSorting: true,
       },
       {
-        header: "Tanggal Pembelian / Tanggal Masuk",
-        accessorKey: "tanggal_pembelian",
-        enableColumnFilter: false,
-        enableSorting: true,
-      },
-      {
         header: "Jumlah",
         accessorKey: "jumlah",
         enableColumnFilter: false,
