@@ -10,50 +10,56 @@ import Flatpickr from "react-flatpickr";
 import ReportPrint from "./print/ReportPrint";
 import ReactToPrint from "react-to-print";
 
-const ReportBarangMasuk = () => {
+const ReportPerbaikanBarang = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
 
   const columns: column[] = React.useMemo(
     () => [
       {
-        header: "Kode Barang",
-        accessorKey: "barang_id.code_barang",
+        header: "Nama",
+        accessorKey: "id_asset_barang.nama",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Nama Barang",
-        accessorKey: "barang_id.nama",
+        header: "Tanggal Perbaikan",
+        accessorKey: "tanggal_perbaikan",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Kategori",
-        accessorKey: "category",
-        enableColumnFilter: false,
-        enableSorting: true,
-      },
-      {
-        header: "Kondisi",
-        accessorKey: "kondisi",
+        header: "Tanggal Selesai",
+        accessorKey: "tanggal_selesai",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
         header: "Jumlah",
-        accessorKey: "quantity",
+        accessorKey: "jumlah",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Satuan",
-        accessorKey: "satuan",
+        header: "Biaya",
+        accessorKey: "biaya",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Tanggal Masuk",
-        accessorKey: "tanggal_masuk",
+        header: "Keterangan",
+        accessorKey: "keterangan",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
+        header: "Kepala Ruangan",
+        accessorKey: "id_user.name",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
+        header: "Status",
+        accessorKey: "status",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -91,15 +97,15 @@ const ReportBarangMasuk = () => {
   const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/new-barang-masuk", {
+      const userResponse = await axiosInstance.get("/api/new-perbaikan", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
         params: {
           start_date: startDate,
           end_date: endDate,
-          kondisi: idKondisi,
-          
+          status: idKondisi,
+          category: "barang",
         },
       });
       setData(userResponse.data.data.data);
@@ -128,7 +134,10 @@ const ReportBarangMasuk = () => {
 
   return (
     <Layout>
-      <BreadCrumb title="Report Barang Masuk" pageTitle="Report Barang Masuk" />
+      <BreadCrumb
+        title="Report Perbaikan Asset"
+        pageTitle="Report Perbaikan Asset"
+      />
       <div className="card">
         <div className="card-body">
           <div className="flex gap-2 mb-4 justify-end">
@@ -139,14 +148,11 @@ const ReportBarangMasuk = () => {
               onChange={(e) => {
                 setIdKondisi(e.target.value);
               }}
-              value={idKondisi || "0"} // set default value
+              value={idKondisi || ""} // set default value
             >
-              <option value="0">Semua Kondisi</option>
-              {kondisi.map((item: any, index: number) => (
-                <option key={index} value={item.nama}>
-                  {item.nama}
-                </option>
-              ))}
+              <option value="">Semua Status</option>
+              <option value="proses">Pending</option>
+              <option value="disetuji">Approve</option>
             </select>
             <div className="relative">
               {/* <button
@@ -155,6 +161,7 @@ const ReportBarangMasuk = () => {
               >
                 Pilih Tanggal
               </button> */}
+
               <div className="flex flex-row gap-2">
                 <Flatpickr
                   options={{
@@ -229,7 +236,7 @@ const ReportBarangMasuk = () => {
       </div>
 
       <div style={{ display: "none" }}>
-        <ReportPrint ref={printRef} title="Report Barang Masuk">
+        <ReportPrint ref={printRef} title="Report Perbaikan Asset">
           <TableContainer
             isPagination={false}
             isTfoot={false}
@@ -260,4 +267,4 @@ const ReportBarangMasuk = () => {
   );
 };
 
-export default ReportBarangMasuk;
+export default ReportPerbaikanBarang;

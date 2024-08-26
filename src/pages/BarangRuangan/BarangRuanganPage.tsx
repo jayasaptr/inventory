@@ -81,13 +81,13 @@ const BarangRuanganPage = () => {
 
     initialValues: {
       id: (eventData && eventData.id) || "",
-      id_barang_masuk: (eventData && eventData.id_barang_masuk.id) || "",
+      id_asset_barang: (eventData && eventData.id_asset_barang.id) || "",
       id_ruangan: (eventData && eventData.id_ruangan.id) || "",
       jumlah: (eventData && eventData.jumlah) || "",
       keterangan: (eventData && eventData.keterangan) || "",
     },
     validationSchema: Yup.object({
-      id_barang_masuk: Yup.string().required("Pilih Barang"),
+      id_asset_barang: Yup.string().required("Pilih Barang"),
       id_ruangan: Yup.string().required("Pilih Ruangan"),
       jumlah: Yup.number().required("Jumlah harus diisi"),
       keterangan: Yup.string().required("Keterangan harus diisi"),
@@ -140,12 +140,7 @@ const BarangRuanganPage = () => {
       },
       {
         header: "Nama",
-        accessorKey: "id_barang_masuk.nama",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Merk",
-        accessorKey: "id_barang_masuk.merk",
+        accessorKey: "id_asset_barang.nama",
         enableColumnFilter: false,
       },
       {
@@ -210,8 +205,8 @@ const BarangRuanganPage = () => {
 
   const fetchDataBarangRuangan = async () => {
     setLoadingV(true);
-    const userQuery = "api/barang-ruangan?search=" + user.user.id;
-    const adminQuery = "api/barang-ruangan";
+    const userQuery = "api/new-barang-ruangan?search=" + user.user.id;
+    const adminQuery = "api/new-barang-ruangan";
 
     try {
       const userResponse = await axiosInstance.get(
@@ -241,7 +236,7 @@ const BarangRuanganPage = () => {
     formData.append("status", "disetuji");
     try {
       const response = await axiosInstance.post(
-        `/api/barang-ruangan/${id}`,
+        `/api/new-barang-ruangan/${id}`,
         formData,
         {
           headers: {
@@ -267,7 +262,7 @@ const BarangRuanganPage = () => {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("id_barang_masuk", data.id_barang_masuk);
+      formData.append("id_asset_barang", data.id_asset_barang);
       formData.append("id_ruangan", data.id_ruangan);
       formData.append("jumlah", data.jumlah);
       formData.append("keterangan", data.keterangan);
@@ -276,7 +271,7 @@ const BarangRuanganPage = () => {
       formData.append("status", "diproses");
 
       const userResponse = await axiosInstance.post(
-        "/api/barang-ruangan",
+        "/api/new-barang-ruangan",
         formData,
         {
           headers: {
@@ -306,7 +301,7 @@ const BarangRuanganPage = () => {
     try {
       setIsLoading(true);
       const userResponse = await axiosInstance.delete(
-        `/api/barang-ruangan/${id}`,
+        `/api/new-barang-ruangan/${id}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -333,7 +328,7 @@ const BarangRuanganPage = () => {
 
   const fetchDataBarang = async () => {
     try {
-      const response = await axiosInstance.get("/api/barang-masuk", {
+      const response = await axiosInstance.get("/api/asset-barang", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -546,23 +541,23 @@ const BarangRuanganPage = () => {
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="id_barang_masuk"
+                  htmlFor="id_asset_barang"
                   className="inline-block mb-2 text-base font-medium"
                 >
                   Pilih Barang
                 </label>
                 <select
-                  id="id_barang_masuk"
+                  id="id_asset_barang"
                   className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_barang_masuk"
+                  name="id_asset_barang"
                   onChange={(e) => {
                     validation.handleChange(e);
-                    validation.setFieldValue("id_barang_masuk", e.target.value);
+                    validation.setFieldValue("id_asset_barang", e.target.value);
                   }}
                   onBlur={validation.handleBlur}
                   value={
-                    validation.values.id_barang_masuk ||
-                    (eventData && eventData.id_barang_masuk.id) ||
+                    validation.values.id_asset_barang ||
+                    (eventData && eventData.id_asset_barang.id) ||
                     ""
                   }
                 >
@@ -573,10 +568,10 @@ const BarangRuanganPage = () => {
                     </option>
                   ))}
                 </select>
-                {validation.touched.id_barang_masuk &&
-                validation.errors.id_barang_masuk ? (
+                {validation.touched.id_asset_barang &&
+                validation.errors.id_asset_barang ? (
                   <p className="text-red-400">
-                    {validation.errors.id_barang_masuk}
+                    {validation.errors.id_asset_barang}
                   </p>
                 ) : null}
               </div>

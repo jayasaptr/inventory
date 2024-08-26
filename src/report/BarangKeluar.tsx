@@ -16,26 +16,26 @@ const ReportBarangKeluar = () => {
   const columns: column[] = React.useMemo(
     () => [
       {
-        header: "Nama",
-        accessorKey: "id_barang_masuk.nama",
+        header: "Kode Barang",
+        accessorKey: "kode",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
-        header: "Merk",
-        accessorKey: "id_barang_masuk.merk",
+        header: "Nama Barang",
+        accessorKey: "nama",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
         header: "Kategori",
-        accessorKey: "id_barang_masuk.id_category.name",
+        accessorKey: "category",
         enableColumnFilter: false,
         enableSorting: true,
       },
       {
         header: "Kondisi",
-        accessorKey: "id_kondisi.nama",
+        accessorKey: "kondisi",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -48,12 +48,6 @@ const ReportBarangKeluar = () => {
       {
         header: "Tanggal Keluar",
         accessorKey: "tanggal_keluar",
-        enableColumnFilter: false,
-        enableSorting: true,
-      },
-      {
-        header: "Keterangan",
-        accessorKey: "keterangan",
         enableColumnFilter: false,
         enableSorting: true,
       },
@@ -92,7 +86,7 @@ const ReportBarangKeluar = () => {
     setLoadingV(true);
     try {
       const userResponse = await axiosInstance.get(
-        "/api/report-barang-keluar",
+        "/api/asset-barang-keluar",
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -100,7 +94,8 @@ const ReportBarangKeluar = () => {
           params: {
             start_date: startDate,
             end_date: endDate,
-            id_kondisi: idKondisi,
+            kondisi: idKondisi,
+            category: "barang",
           },
         }
       );
@@ -148,7 +143,7 @@ const ReportBarangKeluar = () => {
             >
               <option value="0">Semua Kondisi</option>
               {kondisi.map((item: any, index: number) => (
-                <option key={index} value={item.id}>
+                <option key={index} value={item.nama}>
                   {item.nama}
                 </option>
               ))}

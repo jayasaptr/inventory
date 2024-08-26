@@ -12,7 +12,7 @@ import Modal from "Common/Components/Modal";
 import { axiosInstance } from "lib/axios";
 import Layout from "Layout";
 
-const BarangKeluarPage = () => {
+const NewBarangMasukPage = () => {
   const [data, setData] = useState<any>([]);
   const [barang, setBarang] = useState<any>([]);
   const [eventData, setEventData] = useState<any>();
@@ -55,22 +55,19 @@ const BarangKeluarPage = () => {
 
     initialValues: {
       id: (eventData && eventData.id) || "",
-      kode: (eventData && eventData.kode) || "",
-      nama: (eventData && eventData.nama) || "",
+      id_barang: (eventData && eventData.id_barang) || "",
       category: (eventData && eventData.category) || "",
+      quantity: (eventData && eventData.quantity) || "",
       kondisi: (eventData && eventData.kondisi) || "",
-      jumlah: (eventData && eventData.jumlah) || "",
-      tanggal_keluar: (eventData && eventData.tanggal_keluar) || "",
-      penerima: (eventData && eventData.penerima) || "",
-      keterangan: (eventData && eventData.keterangan) || "",
+      tanggal_masuk: (eventData && eventData.tanggal_masuk) || "",
+      satuan: (eventData && eventData.satuan) || "",
     },
     validationSchema: Yup.object({
-      kode: Yup.string().required("Asset is required"),
+      category: Yup.string().required("Category is required"),
+      quantity: Yup.string().required("Quantity is required"),
       kondisi: Yup.string().required("Kondisi is required"),
-      jumlah: Yup.string().required("Jumlah is required"),
-      tanggal_keluar: Yup.string().required("Tanggal Keluar is required"),
-      penerima: Yup.string().required("Penerima is required"),
-      keterangan: Yup.string().required("Keterangan is required"),
+      tanggal_masuk: Yup.string().required("Tanggal Masuk is required"),
+      satuan: Yup.string().required("Satuan is required"),
     }),
 
     onSubmit: (values) => {
@@ -104,12 +101,12 @@ const BarangKeluarPage = () => {
     () => [
       {
         header: "Kode Barang",
-        accessorKey: "kode",
+        accessorKey: "barang_id.code_barang",
         enableColumnFilter: false,
       },
       {
         header: "Nama Barang",
-        accessorKey: "nama",
+        accessorKey: "barang_id.nama",
         enableColumnFilter: false,
       },
       {
@@ -124,12 +121,17 @@ const BarangKeluarPage = () => {
       },
       {
         header: "Jumlah",
-        accessorKey: "jumlah",
+        accessorKey: "quantity",
         enableColumnFilter: false,
       },
       {
-        header: "Tanggal Keluar",
-        accessorKey: "tanggal_keluar",
+        header: "Satuan",
+        accessorKey: "satuan",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Tanggal Masuk",
+        accessorKey: "tanggal_masuk",
         enableColumnFilter: false,
       },
       {
@@ -138,6 +140,16 @@ const BarangKeluarPage = () => {
         enableSorting: true,
         cell: (cell: any) => (
           <div className="flex gap-3">
+            <Link
+              to="#!"
+              className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
+              onClick={() => {
+                const data = cell.row.original;
+                handleUpdateDataClick(data);
+              }}
+            >
+              <Pencil className="size-4" />
+            </Link>
             <Link
               to="#!"
               className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
@@ -162,12 +174,9 @@ const BarangKeluarPage = () => {
   const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/asset-barang", {
+      const userResponse = await axiosInstance.get("/api/barang-masuk", {
         headers: {
           Authorization: `Bearer ${user.token}`,
-        },
-        params: {
-          category: "barang",
         },
       });
       console.log(
@@ -188,12 +197,9 @@ const BarangKeluarPage = () => {
   const fetchNewDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/asset-barang-keluar", {
+      const userResponse = await axiosInstance.get("/api/new-barang-masuk", {
         headers: {
           Authorization: `Bearer ${user.token}`,
-        },
-        params: {
-          category: "barang",
         },
       });
       setData(userResponse.data.data.data);
@@ -211,17 +217,15 @@ const BarangKeluarPage = () => {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("kode", data.kode);
-      formData.append("nama", data.nama);
+      formData.append("barang_id", data.id_barang);
       formData.append("category", data.category);
       formData.append("kondisi", data.kondisi);
-      formData.append("jumlah", data.jumlah);
-      formData.append("tanggal_keluar", data.tanggal_keluar);
-      formData.append("penerima", data.penerima);
-      formData.append("keterangan", data.keterangan);
+      formData.append("quantity", data.quantity);
+      formData.append("tanggal_masuk", data.tanggal_masuk);
+      formData.append("satuan", data.satuan);
 
       const userResponse = await axiosInstance.post(
-        "/api/asset-barang-keluar",
+        "/api/new-barang-masuk",
         formData,
         {
           headers: {
@@ -232,12 +236,12 @@ const BarangKeluarPage = () => {
       );
 
       if (userResponse.data.success === true) {
-        Success("Data Barang Keluar Masuk Berhasil Ditambahkan");
+        Success("Data Barang Masuk Berhasil Ditambahkan");
         fetchNewDataBarangMasuk();
         toggle();
       }
     } catch (error: any) {
-      Error("Data Barang Keluar Masuk Gagal Ditambahkan");
+      Error("Data Barang Masuk Gagal Ditambahkan");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -270,12 +274,12 @@ const BarangKeluarPage = () => {
       );
 
       if (userResponse.data.success === true) {
-        Success("Data Barang Keluar Masuk Berhasil Diupdate");
+        Success("Data Barang Masuk Berhasil Diupdate");
         fetchNewDataBarangMasuk();
         toggle();
       }
     } catch (error: any) {
-      Error("Data Barang Keluar Masuk Gagal Diupdate");
+      Error("Data Barang Masuk Gagal Diupdate");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -289,7 +293,7 @@ const BarangKeluarPage = () => {
     try {
       setIsLoading(true);
       const userResponse = await axiosInstance.delete(
-        `/api/asset-barang-keluar/${id}`,
+        `/api/new-barang-masuk/${id}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -298,11 +302,11 @@ const BarangKeluarPage = () => {
       );
 
       if (userResponse.data.success === true) {
-        Success("Data Barang Keluar Masuk Berhasil Dihapus");
+        Success("Data Barang Masuk Berhasil Dihapus");
         fetchNewDataBarangMasuk();
       }
     } catch (error: any) {
-      Error("Data Barang Keluar Masuk Gagal Dihapus");
+      Error("Data Barang Masuk Gagal Dihapus");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -382,7 +386,7 @@ const BarangKeluarPage = () => {
 
   return (
     <Layout>
-      <BreadCrumb title="Data Barang Keluar" pageTitle="Barang" />
+      <BreadCrumb title="Data Barang" pageTitle="Barang" />
       <DeleteModal
         show={deleteModal}
         onHide={deleteToggle}
@@ -400,7 +404,7 @@ const BarangKeluarPage = () => {
         <div className="card-body">
           <div className="flex items-center gap-3 mb-4">
             <h6 className="text-15 grow">
-              Barang Keluar (<b className="total-Employs">{data.length}</b>)
+              Barang (<b className="total-Employs">{data.length}</b>)
             </h6>
             <div className="shrink-0">
               <Link
@@ -411,7 +415,7 @@ const BarangKeluarPage = () => {
                 onClick={toggle}
               >
                 <Plus className="inline-block size-4" />{" "}
-                <span className="align-middle">Add Barang Keluar</span>
+                <span className="align-middle">Add Barang Masuk</span>
               </Link>
             </div>
           </div>
@@ -465,7 +469,7 @@ const BarangKeluarPage = () => {
           closeButtonClass="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500"
         >
           <Modal.Title className="text-16">
-            {!!isEdit ? "Edit Barang" : "Add Barang Keluar"}
+            {!!isEdit ? "Edit Barang" : "Add Barang Masuk"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
@@ -489,43 +493,68 @@ const BarangKeluarPage = () => {
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="kode"
+                  htmlFor="id_barang"
                   className="inline-block mb-2 text-base font-medium"
                 >
                   Barang
                 </label>
                 <select
-                  id="kode"
+                  id="id_barang"
                   className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="kode"
+                  name="id_barang"
                   onChange={(e) => {
                     validation.handleChange(e);
-                    const selectedItem = barang.find(
-                      (item: any) => item.kode === e.target.value
-                    );
-                    validation.setFieldValue("kode", selectedItem?.kode || "");
-                    validation.setFieldValue("nama", selectedItem?.nama || "");
-                    validation.setFieldValue(
-                      "category",
-                      selectedItem?.category || ""
-                    );
+                    validation.setFieldValue("id_barang", e.target.value);
                   }}
                   onBlur={validation.handleBlur}
                   value={
-                    validation.values.kode ||
-                    (isEdit && eventData && eventData.kode) ||
+                    validation.values.id_barang ||
+                    (isEdit && eventData && eventData.barang_id.id) ||
                     ""
                   }
                 >
                   <option value="">Pilih Barang</option>
                   {barang.map((item: any, index: number) => (
-                    <option key={index} value={item.kode}>
+                    <option key={index} value={item.id}>
                       {item.nama}
                     </option>
                   ))}
                 </select>
-                {validation.touched.kode && validation.errors.kode ? (
-                  <p className="text-red-400">{validation.errors.kode}</p>
+                {validation.touched.id_barang && validation.errors.id_barang ? (
+                  <p className="text-red-400">{validation.errors.id_barang}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="category"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  Kategori
+                </label>
+                <select
+                  id="category"
+                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  name="category"
+                  onChange={(e) => {
+                    validation.handleChange(e);
+                    validation.setFieldValue("category", e.target.value);
+                  }}
+                  onBlur={validation.handleBlur}
+                  value={
+                    validation.values.category ||
+                    (eventData && eventData.category.name) ||
+                    ""
+                  }
+                >
+                  <option value="">Pilih Kategori</option>
+                  {category.map((item: any, index: number) => (
+                    <option key={index} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+                {validation.touched.category && validation.errors.category ? (
+                  <p className="text-red-400">{validation.errors.category}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
@@ -563,86 +592,65 @@ const BarangKeluarPage = () => {
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="jumlah"
+                  htmlFor="quantity"
                   className="inline-block mb-2 text-balance font-medium"
                 >
                   Jumlah
                 </label>
                 <input
                   type="number"
-                  id="jumlah"
+                  id="quantity"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                   placeholder="Jumlah"
-                  name="jumlah"
+                  name="quantity"
                   onChange={validation.handleChange}
-                  value={validation.values.jumlah || ""}
+                  value={validation.values.quantity || ""}
                 />
-                {validation.touched.jumlah && validation.errors.jumlah ? (
-                  <p className="text-red-400">{validation.errors.jumlah}</p>
+                {validation.touched.quantity && validation.errors.quantity ? (
+                  <p className="text-red-400">{validation.errors.quantity}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="tanggal_keluar"
+                  htmlFor="satuan"
                   className="inline-block mb-2 text-balance font-medium"
                 >
-                  Tanggal Keluar
+                  Satuan
+                </label>
+                <input
+                  type="text"
+                  id="satuan"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Satuan"
+                  name="satuan"
+                  onChange={validation.handleChange}
+                  value={validation.values.satuan || ""}
+                />
+                {validation.touched.satuan && validation.errors.satuan ? (
+                  <p className="text-red-400">{validation.errors.satuan}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="tanggal_masuk"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Tanggal Masuk
                 </label>
                 <input
                   type="date"
-                  id="tanggal_keluar"
+                  id="tanggal_masuk"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Tanggal Keluar"
-                  name="tanggal_keluar"
+                  placeholder="Tanggal Masuk"
+                  name="tanggal_masuk"
                   onChange={validation.handleChange}
-                  value={validation.values.tanggal_keluar || ""}
+                  value={validation.values.tanggal_masuk || ""}
                 />
-                {validation.touched.tanggal_keluar &&
-                validation.errors.tanggal_keluar ? (
+                {validation.touched.tanggal_masuk &&
+                validation.errors.tanggal_masuk ? (
                   <p className="text-red-400">
-                    {validation.errors.tanggal_keluar}
+                    {validation.errors.tanggal_masuk}
                   </p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="penerima"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Penerima
-                </label>
-                <input
-                  type="text"
-                  id="penerima"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Penerima"
-                  name="penerima"
-                  onChange={validation.handleChange}
-                  value={validation.values.penerima || ""}
-                />
-                {validation.touched.penerima && validation.errors.penerima ? (
-                  <p className="text-red-400">{validation.errors.penerima}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="keterangan"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Keterangan
-                </label>
-                <input
-                  type="text"
-                  id="keterangan"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Keterangan"
-                  name="keterangan"
-                  onChange={validation.handleChange}
-                  value={validation.values.keterangan || ""}
-                />
-                {validation.touched.keterangan &&
-                validation.errors.keterangan ? (
-                  <p className="text-red-400">{validation.errors.keterangan}</p>
                 ) : null}
               </div>
             </div>
@@ -666,7 +674,7 @@ const BarangKeluarPage = () => {
                   ? "Loading"
                   : !!isEdit
                   ? "Update"
-                  : "Add Barang Keluar"}
+                  : "Add Barang Masuk"}
               </button>
             </div>
           </form>
@@ -676,4 +684,4 @@ const BarangKeluarPage = () => {
   );
 };
 
-export default BarangKeluarPage;
+export default NewBarangMasukPage;

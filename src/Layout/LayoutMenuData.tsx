@@ -21,6 +21,8 @@ import {
   Trophy,
   School,
   UserRound,
+  Package,
+  GanttChartSquareIcon,
   FileLineChart,
 } from "lucide-react";
 
@@ -66,6 +68,18 @@ const menuData: any = [
     link: "/kondisi",
   },
   {
+    id: "Asset",
+    label: "Asset",
+    icon: <GanttChartSquareIcon />,
+    link: "/asset",
+  },
+  {
+    id: "Barang",
+    label: "Barang",
+    icon: <Package />,
+    link: "/barang-masuk",
+  },
+  {
     id: "Ruangan",
     label: "Ruangan",
     icon: <School />,
@@ -109,6 +123,7 @@ const menuData: any = [
   //   icon: <PackagePlus />,
   //   link: "/barang",
   // },
+
   {
     id: "Asset / Barang",
     label: "Asset / Barang",
@@ -116,22 +131,22 @@ const menuData: any = [
     link: "/asset-barang",
   },
   {
-    id: "Asset",
-    label: "Asset",
+    id: "Asset Masuk",
+    label: "Asset Masuk",
     icon: <PackagePlus />,
-    link: "/asset",
-  },
-  {
-    id: "Barang",
-    label: "Barang",
-    icon: <PackagePlus />,
-    link: "/barang-masuk",
+    link: "/asset-masuks",
   },
   {
     id: "Asset Keluar",
     label: "Asset Keluar",
     icon: <PackagePlus />,
     link: "/asset-keluar",
+  },
+  {
+    id: "Barang Masuk",
+    label: "Barang Masuk",
+    icon: <PackagePlus />,
+    link: "/barang-masuks",
   },
   {
     id: "Barang Keluar",

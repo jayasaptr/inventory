@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ToastContainer, ToastPosition, toast } from "react-toastify";
 import {
   CheckCircle,
+  ClipboardList,
   ImagePlus,
   LucidePrinter,
   Pencil,
@@ -25,6 +26,20 @@ import ReportPrint from "report/print/ReportPrint";
 const PengarsipanSurat = () => {
   const [data, setData] = useState<any>([]);
   const [eventData, setEventData] = useState<any>();
+  // Image
+  const [selectedImage, setSelectedImage] = useState<any>();
+  const handleImageChange = (event: any) => {
+    const fileInput = event.target;
+    if (fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        validation.setFieldValue("kwitansi", file);
+        setSelectedImage(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const [show, setShow] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -64,6 +79,7 @@ const PengarsipanSurat = () => {
 
     initialValues: {
       id: (eventData && eventData.id) || "",
+      kwitansi: (eventData && eventData.image) || "",
       nomor_surat: (eventData && eventData.nomor_surat) || "",
       instansi: (eventData && eventData.instansi) || "",
       keterangan: (eventData && eventData.keterangan) || "",
@@ -71,6 +87,7 @@ const PengarsipanSurat = () => {
       tanggal_surat: (eventData && eventData.tanggal_surat) || "",
     },
     validationSchema: Yup.object({
+      kwitansi: Yup.string().required("Image is Required"),
       nomor_surat: Yup.string().required("No Surat is Required"),
       instansi: Yup.string().required("Instansi is Required"),
       keterangan: Yup.string().required("Keterangan is Required"),
@@ -103,7 +120,16 @@ const PengarsipanSurat = () => {
     }
   }, [show, validation]);
 
+  //   show image with modal
+  const [showImage, setShowImage] = useState(false);
+
+  const [image, setImage] = useState("");
+
   const printRef = useRef<HTMLDivElement>(null);
+  const handleShowImage = (image: string) => {
+    setImage(image);
+    setShowImage(true);
+  };
 
   // columns
   const columns = useMemo(
@@ -112,6 +138,20 @@ const PengarsipanSurat = () => {
         header: "No",
         accessorKey: "no",
         enableColumnFilter: false,
+      },
+      {
+        header: "Images",
+        cell: (cell: any) => (
+          <button
+            onClick={() => handleShowImage(cell.row.original.image)}
+            className="flex items-center gap-3"
+          >
+            <div className="size-6 bg-slate-100">
+              <img src={cell.row.original.image} alt="" className="h-6" />
+            </div>
+            <h6 className="grow">{cell.getValue()}</h6>
+          </button>
+        ),
       },
       {
         header: "No Surat",
@@ -275,6 +315,10 @@ const PengarsipanSurat = () => {
       formData.append("keterangan", data.keterangan);
       formData.append("jenis_surat", data.jenis_surat);
       formData.append("tanggal_surat", data.tanggal_surat);
+      // image
+      if (data.kwitansi) {
+        formData.append("image", data.kwitansi);
+      }
 
       const userResponse = await axiosInstance.post("/api/surat", formData, {
         headers: {
@@ -308,6 +352,10 @@ const PengarsipanSurat = () => {
       formData.append("keterangan", data.keterangan);
       formData.append("jenis_surat", data.jenis_surat);
       formData.append("tanggal_surat", data.tanggal_surat);
+      // image
+      if (data.kwitansi) {
+        formData.append("image", data.kwitansi);
+      }
 
       const userResponse = await axiosInstance.post(
         `/api/surat/${data.id}`,
@@ -396,6 +444,25 @@ const PengarsipanSurat = () => {
         onHide={deleteToggle}
         onDelete={handleDelete}
       />
+      <Modal
+        show={showImage}
+        onHide={() => setShowImage(false)}
+        modal-center="true"
+        className="fixed flex flex-col transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4"
+        dialogClassName="w-screen md:w-[30rem] bg-white shadow rounded-md dark:bg-zink-600"
+      >
+        <Modal.Header
+          className="flex items-center justify-between p-4 border-b dark:border-zink-500"
+          closeButtonClass="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500"
+        >
+          <Modal.Title className="text-16">Kwitansi</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
+          <div className="flex justify-center">
+            <img src={image} alt="" className="h-96" />
+          </div>
+        </Modal.Body>
+      </Modal>
       <ToastContainer closeButton={false} limit={1} />
 
       <DeleteModal
@@ -581,6 +648,40 @@ const PengarsipanSurat = () => {
               className="hidden px-4 py-3 text-sm text-red-500 border border-transparent rounded-md bg-red-50 dark:bg-red-500/20"
             ></div>
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+              <div className="xl:col-span-12">
+                <div className="relative size-24 mx-auto mb-4 shadow-md bg-slate-100 profile-user dark:bg-zink-500">
+                  {selectedImage ? (
+                    <img
+                      src={selectedImage || validation.values.kwitansi}
+                      alt=""
+                      className="object-cover w-full h-full user-profile-image"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full">
+                      <ClipboardList className="size-8 text-slate-500 fill-slate-200 dark:text-zink-200 dark:fill-zink-500" />
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 flex items-center justify-center size-8 rounded-full ltr:right-0 rtl:left-0 profile-photo-edit">
+                    <input
+                      id="profile-img-file-input"
+                      name="kwitansi"
+                      type="file"
+                      accept="image/*"
+                      className="hidden profile-img-file-input"
+                      onChange={handleImageChange}
+                    />
+                    <label
+                      htmlFor="profile-img-file-input"
+                      className="flex items-center justify-center size-8 bg-white rounded-full shadow-lg cursor-pointer dark:bg-zink-600 profile-photo-edit"
+                    >
+                      <ImagePlus className="size-4 text-slate-500 fill-slate-200 dark:text-zink-200 dark:fill-zink-500" />
+                    </label>
+                  </div>
+                </div>
+                {validation.touched.kwitansi && validation.errors.kwitansi ? (
+                  <p className="text-red-400">{validation.errors.kwitansi}</p>
+                ) : null}
+              </div>
               <div className="xl:col-span-12">
                 <label
                   htmlFor="nomor_surat"

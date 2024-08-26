@@ -17,39 +17,51 @@ const ReportPerbaikanAsset = () => {
     () => [
       {
         header: "Nama",
-        accessorKey: "asset_id.name",
+        accessorKey: "id_asset_barang.nama",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         header: "Tanggal Perbaikan",
-        accessorKey: "maintenance_date",
+        accessorKey: "tanggal_perbaikan",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
       },
       {
-        header: "Deskripsi",
-        accessorKey: "description",
+        header: "Tanggal Selesai",
+        accessorKey: "tanggal_selesai",
         enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Biaya Perbaikan",
-        accessorKey: "cost",
-        enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         header: "Jumlah",
-        accessorKey: "qty",
+        accessorKey: "jumlah",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
+      },
+      {
+        header: "Biaya",
+        accessorKey: "biaya",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
+        header: "Keterangan",
+        accessorKey: "keterangan",
+        enableColumnFilter: false,
+        enableSorting: true,
+      },
+      {
+        header: "Kepala Ruangan",
+        accessorKey: "id_user.name",
+        enableColumnFilter: false,
+        enableSorting: true,
       },
       {
         header: "Status",
         accessorKey: "status",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
       },
     ],
     []
@@ -85,14 +97,15 @@ const ReportPerbaikanAsset = () => {
   const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/maintenance-asset", {
+      const userResponse = await axiosInstance.get("/api/new-perbaikan", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
         params: {
           start_date: startDate,
           end_date: endDate,
-          search: idKondisi,
+          status: idKondisi,
+          category: "asset",
         },
       });
       setData(userResponse.data.data.data);
@@ -138,8 +151,8 @@ const ReportPerbaikanAsset = () => {
               value={idKondisi || ""} // set default value
             >
               <option value="">Semua Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Approve">Approve</option>
+              <option value="proses">Pending</option>
+              <option value="disetuji">Approve</option>
             </select>
             <div className="relative">
               {/* <button

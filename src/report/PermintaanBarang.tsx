@@ -17,39 +17,39 @@ const ReportPermintaanBarang = () => {
     () => [
       {
         header: "Nama",
-        accessorKey: "id_barang_masuk.nama",
+        accessorKey: "id_asset_barang.nama",
         enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Merk",
-        accessorKey: "id_barang_masuk.merk",
-        enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         header: "Jumlah",
         accessorKey: "jumlah",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         header: "Keterangan",
         accessorKey: "keterangan",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         header: "Ruangan",
         accessorKey: "id_ruangan.nama",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
+      },
+      {
+        header: "Status",
+        accessorKey: "status",
+        enableColumnFilter: false,
+        enableSorting: true,
       },
       {
         header: "Tanggal Permintaan",
         accessorKey: "tanggal",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: true,
       },
     ],
     []
@@ -85,19 +85,16 @@ const ReportPermintaanBarang = () => {
   const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get(
-        "/api/report-barang-ruangan",
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-          params: {
-            start_date: startDate,
-            end_date: endDate,
-            status: idKondisi,
-          },
-        }
-      );
+      const userResponse = await axiosInstance.get("/api/new-barang-ruangan", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+        params: {
+          start_date: startDate,
+          end_date: endDate,
+          status: idKondisi,
+        },
+      });
       setData(userResponse.data.data.data);
     } catch (error: any) {
       if (error.response && error.response.status === 401) {

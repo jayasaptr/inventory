@@ -81,18 +81,22 @@ const PerbaikanAsset = () => {
 
     initialValues: {
       id: (eventData && eventData.id) || "",
-      asset_id: (eventData && eventData.asset_id.id) || "",
-      maintenance_date: (eventData && eventData.maintenance_date) || "",
-      description: (eventData && eventData.description) || "",
-      cost: (eventData && eventData.cost) || "",
-      qty: (eventData && eventData.qty) || "",
+      id_asset_barang: (eventData && eventData.id_asset_barang.id) || "",
+      jumlah: (eventData && eventData.jumlah) || "",
+      biaya: (eventData && eventData.biaya) || "",
+      tanggal_perbaikan: (eventData && eventData.tanggal_perbaikan) || "",
+      tanggal_selesai: (eventData && eventData.tanggal_selesai) || "",
+      keterangan: (eventData && eventData.keterangan) || "",
+      kwitansi: (eventData && eventData.kwitansi) || "",
     },
     validationSchema: Yup.object({
-      asset_id: Yup.string().required("Pilih Asset"),
-      maintenance_date: Yup.string().required("Pilih Tanggal Perbaikan"),
-      description: Yup.string().required("Masukkan Deskripsi"),
-      cost: Yup.string().required("Masukkan Biaya"),
-      qty: Yup.string().required("Masukkan Jumlah"),
+      id_asset_barang: Yup.string().required("Pilih Barang"),
+      jumlah: Yup.number().required("Jumlah Harus Diisi"),
+      biaya: Yup.number().required("Biaya Harus Diisi"),
+      tanggal_perbaikan: Yup.string().required("Tanggal Perbaikan Harus Diisi"),
+      tanggal_selesai: Yup.string().required("Tanggal Selesai Harus Diisi"),
+      keterangan: Yup.string().required("Keterangan Harus Diisi"),
+      kwitansi: Yup.string().required("Kwitansi Harus Diisi"),
     }),
 
     onSubmit: (values) => {
@@ -141,28 +145,52 @@ const PerbaikanAsset = () => {
         enableColumnFilter: false,
       },
       {
+        header: "Kwitansi",
+        cell: (cell: any) => (
+          <button
+            onClick={() => handleShowImage(cell.row.original.kwitansi)}
+            className="flex items-center gap-3"
+          >
+            <div className="size-6 bg-slate-100">
+              <img src={cell.row.original.kwitansi} alt="" className="h-6" />
+            </div>
+            <h6 className="grow">{cell.getValue()}</h6>
+          </button>
+        ),
+      },
+      {
         header: "Nama",
-        accessorKey: "asset_id.name",
+        accessorKey: "id_asset_barang.nama",
         enableColumnFilter: false,
       },
       {
         header: "Tanggal Perbaikan",
-        accessorKey: "maintenance_date",
+        accessorKey: "tanggal_perbaikan",
         enableColumnFilter: false,
       },
       {
-        header: "Deskripsi",
-        accessorKey: "description",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Biaya",
-        accessorKey: "cost",
+        header: "Tanggal Selesai",
+        accessorKey: "tanggal_selesai",
         enableColumnFilter: false,
       },
       {
         header: "Jumlah",
-        accessorKey: "qty",
+        accessorKey: "jumlah",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Biaya",
+        accessorKey: "biaya",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Keterangan",
+        accessorKey: "keterangan",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Kepala Ruangan",
+        accessorKey: "id_user.name",
         enableColumnFilter: false,
       },
       {
@@ -176,20 +204,20 @@ const PerbaikanAsset = () => {
         enableSorting: true,
         cell: (cell: any) => (
           <div className="flex gap-3">
-            {cell.row.original.status === "Approve" ? null : (
+            {cell.row.original.status === "disetuji" ? null : (
               <Link
                 to="#!"
                 className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
                 onClick={() => {
                   const data = cell.row.original;
-                  if (user.user.role === "admin" || user.user.role == "staf") {
+                  if (user.user.role === "admin") {
                     updateStatus(data.id);
                   } else {
                     onClickDelete(data);
                   }
                 }}
               >
-                {user.user.role === "admin" || user.user.role == "staf" ? (
+                {user.user.role === "admin" ? (
                   <Check className="size-4" />
                 ) : (
                   <Trash2 className="size-4" />
@@ -207,14 +235,23 @@ const PerbaikanAsset = () => {
 
   const fetchDataPerbaikan = async () => {
     setLoadingV(true);
-    const adminQuery = "api/maintenance-asset";
+    const userQuery = "api/new-perbaikan?search=" + user.user.id;
+    const adminQuery = "api/new-perbaikan";
 
     try {
-      const userResponse = await axiosInstance.get(adminQuery, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      const userResponse = await axiosInstance.get(
+        user.user.role === "admin" || user.user.role === "staf"
+          ? adminQuery
+          : userQuery,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+          params: {
+            category: "asset",
+          },
+        }
+      );
       setData(userResponse.data.data.data);
     } catch (error: any) {
       if (error.response.status === 401) {
@@ -229,10 +266,10 @@ const PerbaikanAsset = () => {
   //update status by admin
   const updateStatus = async (id: number) => {
     const formData = new FormData();
-    formData.append("status", "Approve");
+    formData.append("status", "disetuji");
     try {
       const response = await axiosInstance.post(
-        `/api/maintenance-asset/${id}`,
+        `/api/new-perbaikan/${id}`,
         formData,
         {
           headers: {
@@ -258,15 +295,18 @@ const PerbaikanAsset = () => {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("asset_id", data.asset_id);
-      formData.append("maintenance_date", data.maintenance_date);
-      formData.append("description", data.description);
-      formData.append("cost", data.cost);
-      formData.append("status", "Pending");
-      formData.append("qty", data.qty);
+      formData.append("id_asset_barang", data.id_asset_barang);
+      formData.append("tanggal_perbaikan", data.tanggal_perbaikan);
+      formData.append("tanggal_selesai", data.tanggal_selesai);
+      formData.append("biaya", data.biaya);
+      formData.append("keterangan", data.keterangan);
+      formData.append("jumlah", data.jumlah);
+      formData.append("kwitansi", data.kwitansi);
+      formData.append("status", "proses");
+      formData.append("id_user", user.user.id);
 
       const userResponse = await axiosInstance.post(
-        "/api/maintenance-asset",
+        "/api/new-perbaikan",
         formData,
         {
           headers: {
@@ -277,12 +317,12 @@ const PerbaikanAsset = () => {
       );
 
       if (userResponse.data.success === true) {
-        Success("Data Asset Keluar Berhasil Ditambahkan");
+        Success("Data Barang Keluar Berhasil Ditambahkan");
         fetchDataPerbaikan();
         toggle();
       }
     } catch (error: any) {
-      Error("Data Asset Keluar Gagal Ditambahkan");
+      Error("Data Barang Keluar Gagal Ditambahkan");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -296,7 +336,7 @@ const PerbaikanAsset = () => {
     try {
       setIsLoading(true);
       const userResponse = await axiosInstance.delete(
-        `/api/maintenance-asset/${id}`,
+        `/api/new-perbaikan/${id}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -323,16 +363,30 @@ const PerbaikanAsset = () => {
 
   const fetchDataBarang = async () => {
     try {
-      const response = await axiosInstance.get(`/api/asset`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      console.log(
-        "🚀 ~ file: PerbaikanAsset.tsx ~ line 318 ~ fetchDataBarang ~ response",
-        response.data.data.data
-      );
-      setBarang(response.data.data.data);
+      if (user.user.role === "kabag") {
+        const response = await axiosInstance.get(
+          `/api/new-barang-ruangan?search=${user.user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+            params: {
+              category: "asset",
+            },
+          }
+        );
+        setBarang(response.data.data.data);
+      } else {
+        const response = await axiosInstance.get(`/api/asset-barang`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+          params: {
+            category: "asset",
+          },
+        });
+        setBarang(response.data.data.data);
+      }
     } catch (error: any) {
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
@@ -374,7 +428,7 @@ const PerbaikanAsset = () => {
 
   return (
     <Layout>
-      <BreadCrumb title="Data Asset" pageTitle="Barang" />
+      <BreadCrumb title="Data Barang" pageTitle="Barang" />
       <DeleteModal
         show={deleteModal}
         onHide={deleteToggle}
@@ -416,18 +470,20 @@ const PerbaikanAsset = () => {
             <h6 className="text-15 grow">
               Perbaikan (<b className="total-Employs">{data.length}</b>)
             </h6>
-            <div className="shrink-0">
-              <Link
-                to="#!"
-                data-modal-target="addEmployeeModal"
-                type="button"
-                className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee"
-                onClick={toggle}
-              >
-                <Plus className="inline-block size-4" />{" "}
-                <span className="align-middle">Add Perbaikan Asset</span>
-              </Link>
-            </div>
+            {user.user.role === "admin" ? null : (
+              <div className="shrink-0">
+                <Link
+                  to="#!"
+                  data-modal-target="addEmployeeModal"
+                  type="button"
+                  className="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee"
+                  onClick={toggle}
+                >
+                  <Plus className="inline-block size-4" />{" "}
+                  <span className="align-middle">Ajukan Perbaikan</span>
+                </Link>
+              </div>
+            )}
           </div>
           {data && data.length > 0 ? (
             // for no get from 1 index
@@ -479,7 +535,7 @@ const PerbaikanAsset = () => {
           closeButtonClass="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500"
         >
           <Modal.Title className="text-16">
-            {!!isEdit ? "Edit Perbaikan" : "Tambahkan Perbaikan"}
+            {!!isEdit ? "Edit Barang" : "Tambahkan Perbaikan"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
@@ -502,122 +558,225 @@ const PerbaikanAsset = () => {
             ></div>
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
+                <div className="relative size-24 mx-auto mb-4 shadow-md bg-slate-100 profile-user dark:bg-zink-500">
+                  {selectedImage ? (
+                    <img
+                      src={selectedImage || validation.values.kwitansi}
+                      alt=""
+                      className="object-cover w-full h-full user-profile-image"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full">
+                      <ClipboardList className="size-8 text-slate-500 fill-slate-200 dark:text-zink-200 dark:fill-zink-500" />
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 flex items-center justify-center size-8 rounded-full ltr:right-0 rtl:left-0 profile-photo-edit">
+                    <input
+                      id="profile-img-file-input"
+                      name="kwitansi"
+                      type="file"
+                      accept="image/*"
+                      className="hidden profile-img-file-input"
+                      onChange={handleImageChange}
+                    />
+                    <label
+                      htmlFor="profile-img-file-input"
+                      className="flex items-center justify-center size-8 bg-white rounded-full shadow-lg cursor-pointer dark:bg-zink-600 profile-photo-edit"
+                    >
+                      <ImagePlus className="size-4 text-slate-500 fill-slate-200 dark:text-zink-200 dark:fill-zink-500" />
+                    </label>
+                  </div>
+                </div>
+                {validation.touched.kwitansi && validation.errors.kwitansi ? (
+                  <p className="text-red-400">{validation.errors.kwitansi}</p>
+                ) : null}
+              </div>
+              {user.user.role === "kabag" ? (
+                <div className="xl:col-span-12">
+                  <label
+                    htmlFor="id_asset_barang"
+                    className="inline-block mb-2 text-base font-medium"
+                  >
+                    Pilih Barang
+                  </label>
+                  <select
+                    id="id_asset_barang"
+                    className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    name="id_asset_barang"
+                    onChange={(e) => {
+                      validation.handleChange(e);
+                      validation.setFieldValue(
+                        "id_asset_barang",
+                        e.target.value
+                      );
+                    }}
+                    onBlur={validation.handleBlur}
+                    value={
+                      validation.values.id_asset_barang ||
+                      (eventData && eventData.id_asset_barang.id) ||
+                      ""
+                    }
+                  >
+                    <option value="">Pilih Barang</option>
+                    {barang.map((item: any, index: number) => (
+                      <option key={index} value={item.id_asset_barang.id}>
+                        {item.id_asset_barang.nama}
+                      </option>
+                    ))}
+                  </select>
+                  {validation.touched.id_asset_barang &&
+                  validation.errors.id_asset_barang ? (
+                    <p className="text-red-400">
+                      {validation.errors.id_asset_barang}
+                    </p>
+                  ) : null}
+                </div>
+              ) : (
+                <div className="xl:col-span-12">
+                  <label
+                    htmlFor="id_asset_barang"
+                    className="inline-block mb-2 text-base font-medium"
+                  >
+                    Pilih Barang
+                  </label>
+                  <select
+                    id="id_asset_barang"
+                    className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                    name="id_asset_barang"
+                    onChange={(e) => {
+                      validation.handleChange(e);
+                      validation.setFieldValue(
+                        "id_asset_barang",
+                        e.target.value
+                      );
+                    }}
+                    onBlur={validation.handleBlur}
+                    value={
+                      validation.values.id_asset_barang ||
+                      (eventData && eventData.id_asset_barang.id) ||
+                      ""
+                    }
+                  >
+                    <option value="">Pilih Barang</option>
+                    {barang.map((item: any, index: number) => (
+                      <option key={index} value={item.id}>
+                        {item.nama}
+                      </option>
+                    ))}
+                  </select>
+                  {validation.touched.id_asset_barang &&
+                  validation.errors.id_asset_barang ? (
+                    <p className="text-red-400">
+                      {validation.errors.id_asset_barang}
+                    </p>
+                  ) : null}
+                </div>
+              )}
+              <div className="xl:col-span-12">
                 <label
-                  htmlFor="id_barang_masuk"
-                  className="inline-block mb-2 text-base font-medium"
+                  htmlFor="jumlah"
+                  className="inline-block mb-2 text-balance font-medium"
                 >
-                  Pilih Barang
+                  Jumlah
                 </label>
-                <select
-                  id="id_barang_masuk"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="asset_id"
-                  onChange={(e) => {
-                    validation.handleChange(e);
-                    validation.setFieldValue("asset_id", e.target.value);
-                  }}
-                  onBlur={validation.handleBlur}
-                  value={
-                    validation.values.asset_id ||
-                    (eventData && eventData.asset_id.id) ||
-                    ""
-                  }
-                >
-                  <option value="">Pilih Asset</option>
-                  {barang.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-                {validation.touched.asset_id && validation.errors.asset_id ? (
-                  <p className="text-red-400">{validation.errors.asset_id}</p>
+                <input
+                  type="number"
+                  id="jumlah"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Jumlah"
+                  name="jumlah"
+                  onChange={validation.handleChange}
+                  value={validation.values.jumlah || ""}
+                />
+                {validation.touched.jumlah && validation.errors.jumlah ? (
+                  <p className="text-red-400">{validation.errors.jumlah}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="maintenance_date"
+                  htmlFor="biaya"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Biaya
+                </label>
+                <input
+                  type="number"
+                  id="biaya"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Biaya"
+                  name="biaya"
+                  onChange={validation.handleChange}
+                  value={validation.values.biaya || ""}
+                />
+                {validation.touched.biaya && validation.errors.biaya ? (
+                  <p className="text-red-400">{validation.errors.biaya}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="tanggal_perbaikan"
                   className="inline-block mb-2 text-balance font-medium"
                 >
                   Tanggal Perbaikan
                 </label>
                 <input
                   type="date"
-                  id="maintenance_date"
+                  id="tanggal_perbaikan"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                   placeholder="Tanggal Perbaikan"
-                  name="maintenance_date"
+                  name="tanggal_perbaikan"
                   onChange={validation.handleChange}
-                  value={validation.values.maintenance_date || ""}
+                  value={validation.values.tanggal_perbaikan || ""}
                 />
-                {validation.touched.maintenance_date &&
-                validation.errors.maintenance_date ? (
+                {validation.touched.tanggal_perbaikan &&
+                validation.errors.tanggal_perbaikan ? (
                   <p className="text-red-400">
-                    {validation.errors.maintenance_date}
+                    {validation.errors.tanggal_perbaikan}
                   </p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="description"
+                  htmlFor="tanggal_selesai"
                   className="inline-block mb-2 text-balance font-medium"
                 >
-                  Deskripsi
+                  Tanggal Selesai
+                </label>
+                <input
+                  type="date"
+                  id="tanggal_selesai"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Tanggal Selesai"
+                  name="tanggal_selesai"
+                  onChange={validation.handleChange}
+                  value={validation.values.tanggal_selesai || ""}
+                />
+                {validation.touched.tanggal_selesai &&
+                validation.errors.tanggal_selesai ? (
+                  <p className="text-red-400">
+                    {validation.errors.tanggal_selesai}
+                  </p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="keterangan"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Keterangan
                 </label>
                 <input
                   type="text"
-                  id="description"
+                  id="keterangan"
                   className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Deskripsi"
-                  name="description"
+                  placeholder="Keterangan"
+                  name="keterangan"
                   onChange={validation.handleChange}
-                  value={validation.values.description || ""}
+                  value={validation.values.keterangan || ""}
                 />
-                {validation.touched.description &&
-                validation.errors.description ? (
-                  <p className="text-red-400">
-                    {validation.errors.description}
-                  </p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="cost"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Biaya Perbaikan
-                </label>
-                <input
-                  type="number"
-                  id="cost"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Biaya Perbaikan"
-                  name="cost"
-                  onChange={validation.handleChange}
-                  value={validation.values.cost || ""}
-                />
-                {validation.touched.cost && validation.errors.cost ? (
-                  <p className="text-red-400">{validation.errors.cost}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="qty"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Jumlah
-                </label>
-                <input
-                  type="int"
-                  id="qty"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Jumlah"
-                  name="qty"
-                  onChange={validation.handleChange}
-                  value={validation.values.qty || ""}
-                />
-                {validation.touched.qty && validation.errors.qty ? (
-                  <p className="text-red-400">{validation.errors.qty}</p>
+                {validation.touched.keterangan &&
+                validation.errors.keterangan ? (
+                  <p className="text-red-400">{validation.errors.keterangan}</p>
                 ) : null}
               </div>
             </div>

@@ -140,7 +140,7 @@ const AssetBarangPage = () => {
 
   const fetchDataBarang = async () => {
     try {
-      const userResponse = await axiosInstance.get("/api/barang-asset", {
+      const userResponse = await axiosInstance.get("/api/asset-barang", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -251,24 +251,10 @@ const AssetBarangPage = () => {
     }
   };
 
-  const [category, setCategory] = useState<any>([]);
-
-  const fetchDataCategory = async () => {
-    try {
-      const response = await axiosInstance.get("/api/category", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      setCategory(response.data.data.data);
-    } catch (error) {
-      console.log("🚀 ~ fetchDataCategory= ~ error:", error);
-    }
-  };
+  
 
   useEffect(() => {
     fetchDataBarang();
-    fetchDataCategory();
   }, [idCategory, namaBarang]);
 
   const printRef = useRef<HTMLDivElement>(null);
@@ -329,8 +315,11 @@ const AssetBarangPage = () => {
                   value={idCategory || ""} // set default value
                 >
                   <option value="">Semua Category</option>
-                  <option value="Asset">Asset</option>
-                  <option value="Barang">Barang</option>
+                  {data.map((item: any) => (
+                    <option key={item.category} value={item.category}>
+                      {item.category}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -547,24 +536,6 @@ const AssetBarangPage = () => {
                 >
                   Category
                 </label>
-                <select
-                  id="id_category"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_category"
-                  onChange={(e) => {
-                    validation.handleChange(e);
-                    validation.setFieldValue("id_category", e.target.value);
-                  }}
-                  onBlur={validation.handleBlur}
-                  value={validation.values.id_category || ""} // set default value
-                >
-                  <option value="">Pilih Category</option>
-                  {category.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
                 {validation.touched.id_category &&
                 validation.errors.id_category ? (
                   <p className="text-red-400">

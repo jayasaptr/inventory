@@ -56,24 +56,10 @@ const AssetPage = () => {
       id: (eventData && eventData.id) || "",
       name: (eventData && eventData.name) || "",
       code: (eventData && eventData.code) || "",
-      kondisi: (eventData && eventData.kondisi) || "",
-      description: (eventData && eventData.description) || "",
-      purchase_date: (eventData && eventData.purchase_date) || "",
-      type: (eventData && eventData.type) || "",
-      price: (eventData && eventData.price) || "",
-      quantity: (eventData && eventData.quantity) || "",
-      satuan: (eventData && eventData.satuan) || "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Nama Barang is Required"),
       code: Yup.string().required("Code is Required"),
-      kondisi: Yup.string().required("Kondisi is Required"),
-      description: Yup.string().required("Description is Required"),
-      purchase_date: Yup.string().required("Purchase Date is Required"),
-      type: Yup.string().required("Type is Required"),
-      price: Yup.number().required("Price is Required"),
-      quantity: Yup.number().required("Quantity is Required"),
-      satuan: Yup.string().required("Satuan is Required"),
     }),
 
     onSubmit: (values) => {
@@ -119,48 +105,6 @@ const AssetPage = () => {
       {
         header: "Kode Asset",
         accessorKey: "code",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Kondisi",
-        accessorKey: "kondisi",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Deskripsi",
-        accessorKey: "description",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Tanggal Pembelian",
-        accessorKey: "purchase_date",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Type",
-        accessorKey: "type",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Harga",
-        accessorKey: "price",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Jumlah",
-        accessorKey: "quantity",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        header: "Satuan",
-        accessorKey: "satuan",
         enableColumnFilter: false,
         enableSorting: false,
       },
@@ -231,13 +175,6 @@ const AssetPage = () => {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("code", data.code);
-      formData.append("kondisi", data.kondisi);
-      formData.append("description", data.description);
-      formData.append("purchase_date", data.purchase_date);
-      formData.append("type", data.type);
-      formData.append("price", data.price);
-      formData.append("quantity", data.quantity);
-      formData.append("satuan", data.satuan);
 
       const userResponse = await axiosInstance.post("/api/asset", formData, {
         headers: {
@@ -268,13 +205,6 @@ const AssetPage = () => {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("code", data.code);
-      formData.append("kondisi", data.kondisi);
-      formData.append("description", data.description);
-      formData.append("purchase_date", data.purchase_date);
-      formData.append("type", data.type);
-      formData.append("price", data.price);
-      formData.append("quantity", data.quantity);
-      formData.append("satuan", data.satuan);
 
       const userResponse = await axiosInstance.post(
         `/api/asset/${data.id}`,
@@ -502,157 +432,6 @@ const AssetPage = () => {
                 />
                 {validation.touched.name && validation.errors.name ? (
                   <p className="text-red-400">{validation.errors.name}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="kondisi"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Kondisi Asset
-                </label>
-                <input
-                  type="text"
-                  id="kondisi"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Kondisi Asset"
-                  name="kondisi"
-                  onChange={validation.handleChange}
-                  value={validation.values.kondisi || ""}
-                />
-                {validation.touched.kondisi && validation.errors.kondisi ? (
-                  <p className="text-red-400">{validation.errors.kondisi}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="type"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Type
-                </label>
-                {/* Select */}
-                <select
-                  id="type"
-                  name="type"
-                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  onChange={validation.handleChange}
-                  value={validation.values.type || ""}
-                >
-                  <option value="">Select Type</option>
-                  <option value="Asset Tidak Bergerak">
-                    Asset Tidak Bergerak
-                  </option>
-                  <option value="Asset Bergerak">Asset Bergerak</option>
-                </select>
-                {validation.touched.type && validation.errors.type ? (
-                  <p className="text-red-400">{validation.errors.type}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="description"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Deskripsi
-                </label>
-                <input
-                  type="text"
-                  id="description"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Deskripsi"
-                  name="description"
-                  onChange={validation.handleChange}
-                  value={validation.values.description || ""}
-                />
-                {validation.touched.description &&
-                validation.errors.description ? (
-                  <p className="text-red-400">
-                    {validation.errors.description}
-                  </p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="purchase_date"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Tanggal Pembelian
-                </label>
-                <input
-                  type="date"
-                  id="purchase_date"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Tanggal Pembelian"
-                  name="purchase_date"
-                  onChange={validation.handleChange}
-                  value={validation.values.purchase_date || ""}
-                />
-                {validation.touched.purchase_date &&
-                validation.errors.purchase_date ? (
-                  <p className="text-red-400">
-                    {validation.errors.purchase_date}
-                  </p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="price"
-                  className="inline-block mb-2 text-base font-medium"
-                >
-                  Harga
-                </label>
-                <input
-                  type="number"
-                  id="price"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Harga"
-                  name="price"
-                  onChange={validation.handleChange}
-                  value={validation.values.price || ""}
-                />
-                {validation.touched.price && validation.errors.price ? (
-                  <p className="text-red-400">{validation.errors.price}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="quantity"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Jumlah
-                </label>
-                <input
-                  type="number"
-                  id="quantity"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Jumlah"
-                  name="quantity"
-                  onChange={validation.handleChange}
-                  value={validation.values.quantity || ""}
-                />
-                {validation.touched.quantity && validation.errors.quantity ? (
-                  <p className="text-red-400">{validation.errors.quantity}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
-                  htmlFor="satuan"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Satuan
-                </label>
-                <input
-                  type="text"
-                  id="satuan"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Satuan"
-                  name="satuan"
-                  onChange={validation.handleChange}
-                  value={validation.values.satuan || ""}
-                />
-                {validation.touched.satuan && validation.errors.satuan ? (
-                  <p className="text-red-400">{validation.errors.satuan}</p>
                 ) : null}
               </div>
             </div>

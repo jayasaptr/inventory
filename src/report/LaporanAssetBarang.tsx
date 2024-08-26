@@ -82,17 +82,19 @@ const LaporanAssetBarang = () => {
     }
   };
 
+  const [idCategory, setIdCategory] = useState<any>("");
+
   const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/barang-asset", {
+      const userResponse = await axiosInstance.get("/api/asset-barang", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
         params: {
           start_date: startDate,
           end_date: endDate,
-          category: idKondisi,
+          category: idCategory,
         },
       });
       setData(userResponse.data.data.data);
@@ -117,7 +119,7 @@ const LaporanAssetBarang = () => {
   React.useEffect(() => {
     fetchDataBarangMasuk();
     fetchDataKondisi();
-  }, [startDate, endDate, idKondisi]);
+  }, [startDate, endDate, idKondisi, idCategory]);
 
   return (
     <Layout>
@@ -133,13 +135,16 @@ const LaporanAssetBarang = () => {
               className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
               name="id_category"
               onChange={(e) => {
-                setIdKondisi(e.target.value);
+                setIdCategory(e.target.value);
               }}
-              value={idKondisi || ""} // set default value
+              value={idCategory || ""} // set default value
             >
               <option value="">Semua Category</option>
-              <option value="Asset">Asset</option>
-              <option value="Barang">Barang</option>
+              {data.map((item: any) => (
+                <option key={item.category} value={item.category}>
+                  {item.category}
+                </option>
+              ))}
             </select>
             <div className="relative">
               {/* <button

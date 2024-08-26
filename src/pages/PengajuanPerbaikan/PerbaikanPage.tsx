@@ -81,7 +81,7 @@ const PengajuanPerbaikan = () => {
 
     initialValues: {
       id: (eventData && eventData.id) || "",
-      id_barang_masuk: (eventData && eventData.id_barang_masuk.id) || "",
+      id_asset_barang: (eventData && eventData.id_asset_barang.id) || "",
       jumlah: (eventData && eventData.jumlah) || "",
       biaya: (eventData && eventData.biaya) || "",
       tanggal_perbaikan: (eventData && eventData.tanggal_perbaikan) || "",
@@ -90,7 +90,7 @@ const PengajuanPerbaikan = () => {
       kwitansi: (eventData && eventData.kwitansi) || "",
     },
     validationSchema: Yup.object({
-      id_barang_masuk: Yup.string().required("Pilih Barang"),
+      id_asset_barang: Yup.string().required("Pilih Barang"),
       jumlah: Yup.number().required("Jumlah Harus Diisi"),
       biaya: Yup.number().required("Biaya Harus Diisi"),
       tanggal_perbaikan: Yup.string().required("Tanggal Perbaikan Harus Diisi"),
@@ -160,12 +160,7 @@ const PengajuanPerbaikan = () => {
       },
       {
         header: "Nama",
-        accessorKey: "id_barang_masuk.nama",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Merk",
-        accessorKey: "id_barang_masuk.merk",
+        accessorKey: "id_asset_barang.nama",
         enableColumnFilter: false,
       },
       {
@@ -240,8 +235,8 @@ const PengajuanPerbaikan = () => {
 
   const fetchDataPerbaikan = async () => {
     setLoadingV(true);
-    const userQuery = "api/perbaikan?search=" + user.user.id;
-    const adminQuery = "api/perbaikan";
+    const userQuery = "api/new-perbaikan?search=" + user.user.id;
+    const adminQuery = "api/new-perbaikan";
 
     try {
       const userResponse = await axiosInstance.get(
@@ -251,6 +246,9 @@ const PengajuanPerbaikan = () => {
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
+          },
+          params: {
+            category: "barang",
           },
         }
       );
@@ -271,7 +269,7 @@ const PengajuanPerbaikan = () => {
     formData.append("status", "disetuji");
     try {
       const response = await axiosInstance.post(
-        `/api/perbaikan/${id}`,
+        `/api/new-perbaikan/${id}`,
         formData,
         {
           headers: {
@@ -297,7 +295,7 @@ const PengajuanPerbaikan = () => {
     try {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("id_barang_masuk", data.id_barang_masuk);
+      formData.append("id_asset_barang", data.id_asset_barang);
       formData.append("tanggal_perbaikan", data.tanggal_perbaikan);
       formData.append("tanggal_selesai", data.tanggal_selesai);
       formData.append("biaya", data.biaya);
@@ -305,9 +303,10 @@ const PengajuanPerbaikan = () => {
       formData.append("jumlah", data.jumlah);
       formData.append("kwitansi", data.kwitansi);
       formData.append("status", "proses");
+      formData.append("id_user", user.user.id);
 
       const userResponse = await axiosInstance.post(
-        "/api/perbaikan",
+        "/api/new-perbaikan",
         formData,
         {
           headers: {
@@ -336,11 +335,14 @@ const PengajuanPerbaikan = () => {
   const handleDeleteDataBarangMasuk = async (id: any) => {
     try {
       setIsLoading(true);
-      const userResponse = await axiosInstance.delete(`/api/perbaikan/${id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      const userResponse = await axiosInstance.delete(
+        `/api/new-perbaikan/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
 
       if (userResponse.data.success === true) {
         Success("Data Perbaikan Berhasil Dihapus");
@@ -363,18 +365,24 @@ const PengajuanPerbaikan = () => {
     try {
       if (user.user.role === "kabag") {
         const response = await axiosInstance.get(
-          `/api/barang-ruangan?search=${user.user.id}`,
+          `/api/new-barang-ruangan?search=${user.user.id}`,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,
+            },
+            params: {
+              category: "barang",
             },
           }
         );
         setBarang(response.data.data.data);
       } else {
-        const response = await axiosInstance.get(`/api/barang-masuk`, {
+        const response = await axiosInstance.get(`/api/asset-barang`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
+          },
+          params: {
+            category: "barang",
           },
         });
         setBarang(response.data.data.data);
@@ -586,66 +594,66 @@ const PengajuanPerbaikan = () => {
               {user.user.role === "kabag" ? (
                 <div className="xl:col-span-12">
                   <label
-                    htmlFor="id_barang_masuk"
+                    htmlFor="id_asset_barang"
                     className="inline-block mb-2 text-base font-medium"
                   >
                     Pilih Barang
                   </label>
                   <select
-                    id="id_barang_masuk"
+                    id="id_asset_barang"
                     className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                    name="id_barang_masuk"
+                    name="id_asset_barang"
                     onChange={(e) => {
                       validation.handleChange(e);
                       validation.setFieldValue(
-                        "id_barang_masuk",
+                        "id_asset_barang",
                         e.target.value
                       );
                     }}
                     onBlur={validation.handleBlur}
                     value={
-                      validation.values.id_barang_masuk ||
-                      (eventData && eventData.id_barang_masuk.id) ||
+                      validation.values.id_asset_barang ||
+                      (eventData && eventData.id_asset_barang.id) ||
                       ""
                     }
                   >
                     <option value="">Pilih Barang</option>
                     {barang.map((item: any, index: number) => (
-                      <option key={index} value={item.id_barang_masuk.id}>
-                        {item.id_barang_masuk.nama}
+                      <option key={index} value={item.id_asset_barang.id}>
+                        {item.id_asset_barang.nama}
                       </option>
                     ))}
                   </select>
-                  {validation.touched.id_barang_masuk &&
-                  validation.errors.id_barang_masuk ? (
+                  {validation.touched.id_asset_barang &&
+                  validation.errors.id_asset_barang ? (
                     <p className="text-red-400">
-                      {validation.errors.id_barang_masuk}
+                      {validation.errors.id_asset_barang}
                     </p>
                   ) : null}
                 </div>
               ) : (
                 <div className="xl:col-span-12">
                   <label
-                    htmlFor="id_barang_masuk"
+                    htmlFor="id_asset_barang"
                     className="inline-block mb-2 text-base font-medium"
                   >
                     Pilih Barang
                   </label>
                   <select
-                    id="id_barang_masuk"
+                    id="id_asset_barang"
                     className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                    name="id_barang_masuk"
+                    name="id_asset_barang"
                     onChange={(e) => {
                       validation.handleChange(e);
                       validation.setFieldValue(
-                        "id_barang_masuk",
+                        "id_asset_barang",
                         e.target.value
                       );
                     }}
                     onBlur={validation.handleBlur}
                     value={
-                      validation.values.id_barang_masuk ||
-                      (eventData && eventData.id_barang_masuk.id) ||
+                      validation.values.id_asset_barang ||
+                      (eventData && eventData.id_asset_barang.id) ||
                       ""
                     }
                   >
@@ -656,10 +664,10 @@ const PengajuanPerbaikan = () => {
                       </option>
                     ))}
                   </select>
-                  {validation.touched.id_barang_masuk &&
-                  validation.errors.id_barang_masuk ? (
+                  {validation.touched.id_asset_barang &&
+                  validation.errors.id_asset_barang ? (
                     <p className="text-red-400">
-                      {validation.errors.id_barang_masuk}
+                      {validation.errors.id_asset_barang}
                     </p>
                   ) : null}
                 </div>

@@ -113,10 +113,16 @@ const menuUser: any = [
     link: "/permintaan-barang",
   },
   {
-    id: "Pengajuan Perbaikan",
-    label: "Pengajuan Perbaikan",
+    id: "Pengajuan Perbaikan Barang",
+    label: "Pengajuan Perbaikan Barang",
     icon: <Award />,
     link: "/pengajuan-perbaikan",
+  },
+  {
+    id: "Pengajuan Perbaikan Asset",
+    label: "Pengajuan Perbaikan Asset",
+    icon: <Award />,
+    link: "/pengajuan-perbaikan-asset",
   },
 ];
 

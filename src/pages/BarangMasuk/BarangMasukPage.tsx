@@ -56,26 +56,10 @@ const BarangMasukPage = () => {
       id: (eventData && eventData.id) || "",
       nama: (eventData && eventData.nama) || "",
       code_barang: (eventData && eventData.code_barang) || "",
-      merk: (eventData && eventData.merk) || "",
-      id_category: (eventData && eventData.id_category.id) || "",
-      id_kondisi: (eventData && eventData.id_kondisi.id) || "",
-      jumlah: (eventData && eventData.jumlah) || "",
-      satuan: (eventData && eventData.satuan) || "",
-      harga: (eventData && eventData.harga) || "",
-      tanggal_masuk: (eventData && eventData.tanggal_masuk) || "",
-      keterangan: (eventData && eventData.keterangan) || "",
     },
     validationSchema: Yup.object({
       nama: Yup.string().required("Nama Barang harus diisi!"),
       code_barang: Yup.string().required("Code Barang harus diisi!"),
-      merk: Yup.string().required("Merk harus diisi!"),
-      id_category: Yup.string().required("Kategori harus diisi!"),
-      id_kondisi: Yup.string().required("Kondisi harus diisi!"),
-      jumlah: Yup.string().required("Jumlah harus diisi!"),
-      satuan: Yup.string().required("Satuan harus diisi!"),
-      harga: Yup.string().required("Harga harus diisi!"),
-      tanggal_masuk: Yup.string().required("Tanggal Masuk harus diisi!"),
-      keterangan: Yup.string().required("Keterangan harus diisi!"),
     }),
 
     onSubmit: (values) => {
@@ -115,56 +99,6 @@ const BarangMasukPage = () => {
       {
         header: "Nama",
         accessorKey: "nama",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Merk",
-        accessorKey: "merk",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Kategori",
-        accessorKey: "id_category.name",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Kondisi",
-        accessorKey: "id_kondisi.nama",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Jumlah Masuk",
-        accessorKey: "jumlah",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Stock Tersedia",
-        accessorKey: "stock",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Satuan",
-        accessorKey: "satuan",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Harga Satuan",
-        accessorKey: "harga",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Tanggal Masuk",
-        accessorKey: "tanggal_masuk",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Keterangan",
-        accessorKey: "keterangan",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Total Harga",
-        accessorKey: "total_harga",
         enableColumnFilter: false,
       },
       {
@@ -234,14 +168,6 @@ const BarangMasukPage = () => {
       const formData = new FormData();
       formData.append("nama", data.nama);
       formData.append("code_barang", data.code_barang);
-      formData.append("merk", data.merk);
-      formData.append("id_category", data.id_category);
-      formData.append("id_kondisi", data.id_kondisi);
-      formData.append("jumlah", data.jumlah);
-      formData.append("satuan", data.satuan);
-      formData.append("harga", data.harga);
-      formData.append("tanggal_masuk", data.tanggal_masuk);
-      formData.append("keterangan", data.keterangan);
 
       const userResponse = await axiosInstance.post(
         "/api/barang-masuk",
@@ -276,14 +202,6 @@ const BarangMasukPage = () => {
       const formData = new FormData();
       formData.append("nama", data.nama);
       formData.append("code_barang", data.code_barang);
-      formData.append("merk", data.merk);
-      formData.append("id_category", data.id_category);
-      formData.append("id_kondisi", data.id_kondisi);
-      formData.append("jumlah", data.jumlah);
-      formData.append("satuan", data.satuan);
-      formData.append("harga", data.harga);
-      formData.append("tanggal_masuk", data.tanggal_masuk);
-      formData.append("keterangan", data.keterangan);
 
       const userResponse = await axiosInstance.post(
         `/api/barang-masuk/${data.id}`,
@@ -556,7 +474,7 @@ const BarangMasukPage = () => {
                   <p className="text-red-400">{validation.errors.nama}</p>
                 ) : null}
               </div>
-              <div className="xl:col-span-12">
+              {/* <div className="xl:col-span-12">
                 <label
                   htmlFor="merk"
                   className="inline-block mb-2 text-base font-medium"
@@ -749,7 +667,7 @@ const BarangMasukPage = () => {
                 validation.errors.keterangan ? (
                   <p className="text-red-400">{validation.errors.keterangan}</p>
                 ) : null}
-              </div>
+              </div> */}
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <button

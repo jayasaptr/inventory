@@ -14,8 +14,8 @@ import Layout from "Layout";
 
 const AssetKeluar = () => {
   const [data, setData] = useState<any>([]);
+  const [barang, setBarang] = useState<any>([]);
   const [eventData, setEventData] = useState<any>();
-  const [id, setId] = useState<number>(0);
 
   const [show, setShow] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -26,15 +26,16 @@ const AssetKeluar = () => {
   const deleteToggle = () => setDeleteModal(!deleteModal);
 
   // Delete Data
-  const onClickDelete = (cell: number) => {
+  const onClickDelete = (cell: any) => {
     setDeleteModal(true);
-    setId(cell);
+    if (cell.id) {
+      setEventData(cell);
+    }
   };
 
   const handleDelete = () => {
-    console.log("🚀 ~ handleDelete ~ eventData:", id);
-    if (id) {
-      handleDeleteDataAssetMasuk(id);
+    if (eventData) {
+      handleDeleteDataBarangMasuk(eventData.id);
       setDeleteModal(false);
     }
   };
@@ -53,28 +54,31 @@ const AssetKeluar = () => {
     enableReinitialize: true,
 
     initialValues: {
-      // id: (eventData && eventData.id) || "",
-      id_asset: (eventData && eventData.id_asset.id) || "",
-      kondisi: (eventData && eventData.kondisi.id) || "",
+      id: (eventData && eventData.id) || "",
+      kode: (eventData && eventData.kode) || "",
+      nama: (eventData && eventData.nama) || "",
+      category: (eventData && eventData.category) || "",
+      kondisi: (eventData && eventData.kondisi) || "",
       jumlah: (eventData && eventData.jumlah) || "",
-      penerima: (eventData && eventData.penerima) || "",
       tanggal_keluar: (eventData && eventData.tanggal_keluar) || "",
+      penerima: (eventData && eventData.penerima) || "",
       keterangan: (eventData && eventData.keterangan) || "",
     },
     validationSchema: Yup.object({
-      id_asset: Yup.string().required("Pilih Asset"),
-      kondisi: Yup.string().required("Pilih Kondisi"),
-      jumlah: Yup.string().required("Jumlah harus diisi"),
-      penerima: Yup.string().required("Penerima harus diisi"),
-      tanggal_keluar: Yup.string().required("Tanggal Keluar harus diisi"),
-      keterangan: Yup.string().required("Keterangan harus diisi"),
+      kode: Yup.string().required("Asset is required"),
+      kondisi: Yup.string().required("Kondisi is required"),
+      jumlah: Yup.string().required("Jumlah is required"),
+      tanggal_keluar: Yup.string().required("Tanggal Keluar is required"),
+      penerima: Yup.string().required("Penerima is required"),
+      keterangan: Yup.string().required("Keterangan is required"),
     }),
 
     onSubmit: (values) => {
-      console.log("🚀 ~ AssetPage ~ values:", values);
+      console.log("🚀 ~ BarangPage ~ values:", values);
       if (isEdit) {
+        handleUpdateBarangMasuk(values);
       } else {
-        handlePostAssetKeluar(values);
+        handlePostBarangMasuk(values);
       }
       if (isLoading) {
         toggle();
@@ -99,18 +103,23 @@ const AssetKeluar = () => {
   const columns = useMemo(
     () => [
       {
-        header: "No",
-        accessorKey: "no",
+        header: "Kode Barang",
+        accessorKey: "kode",
         enableColumnFilter: false,
       },
       {
-        header: "Nama",
-        accessorKey: "id_asset.name",
+        header: "Nama Barang",
+        accessorKey: "nama",
         enableColumnFilter: false,
       },
       {
-        header: "Penerima",
-        accessorKey: "penerima",
+        header: "Kategori",
+        accessorKey: "category",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Kondisi",
+        accessorKey: "kondisi",
         enableColumnFilter: false,
       },
       {
@@ -124,16 +133,6 @@ const AssetKeluar = () => {
         enableColumnFilter: false,
       },
       {
-        header: "Kondisi",
-        accessorKey: "kondisi",
-        enableColumnFilter: false,
-      },
-      {
-        header: "Keterangan",
-        accessorKey: "keterangan",
-        enableColumnFilter: false,
-      },
-      {
         header: "Action",
         enableColumnFilter: false,
         enableSorting: true,
@@ -144,7 +143,7 @@ const AssetKeluar = () => {
               className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
               onClick={() => {
                 const data = cell.row.original;
-                onClickDelete(data.id);
+                onClickDelete(data);
               }}
             >
               <Trash2 className="size-4" />
@@ -160,13 +159,42 @@ const AssetKeluar = () => {
 
   const naviagate = useNavigate();
 
-  const fetchDataAssetKeluar = async () => {
+  const fetchDataBarangMasuk = async () => {
     setLoadingV(true);
     try {
-      const userResponse = await axiosInstance.get("/api/asset-keluar", {
+      const userResponse = await axiosInstance.get("/api/asset-barang", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
+        params: {
+          category: "asset",
+        },
+      });
+      console.log(
+        "🚀 ~ fetchDataUser ~ userResponse:",
+        userResponse.data.data.data
+      );
+      setBarang(userResponse.data.data.data);
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
+    } finally {
+      setLoadingV(false);
+    }
+  };
+
+  const fetchNewDataBarangMasuk = async () => {
+    setLoadingV(true);
+    try {
+      const userResponse = await axiosInstance.get("/api/asset-barang-keluar", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+        params:{
+          category: "asset"
+        }
       });
       setData(userResponse.data.data.data);
     } catch (error: any) {
@@ -179,11 +207,89 @@ const AssetKeluar = () => {
     }
   };
 
-  const handleDeleteDataAssetMasuk = async (id: any) => {
+  const handlePostBarangMasuk = async (data: any) => {
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("kode", data.kode);
+      formData.append("nama", data.nama);
+      formData.append("category", data.category);
+      formData.append("kondisi", data.kondisi);
+      formData.append("jumlah", data.jumlah);
+      formData.append("tanggal_keluar", data.tanggal_keluar);
+      formData.append("penerima", data.penerima);
+      formData.append("keterangan", data.keterangan);
+
+      const userResponse = await axiosInstance.post(
+        "/api/asset-barang-keluar",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (userResponse.data.success === true) {
+        Success("Data Asset Keluar Masuk Berhasil Ditambahkan");
+        fetchNewDataBarangMasuk();
+        toggle();
+      }
+    } catch (error: any) {
+      Error("Data Asset Keluar Masuk Gagal Ditambahkan");
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateBarangMasuk = async (data: any) => {
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("barang_id", data.id_barang || eventData.barang_id.id);
+      formData.append("category", data.category);
+      formData.append("kondisi", data.kondisi);
+      formData.append("quantity", data.quantity);
+      formData.append("tanggal_masuk", data.tanggal_masuk);
+      formData.append("satuan", data.satuan);
+
+      const userResponse = await axiosInstance.post(
+        `/api/new-barang-masuk/${data.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (userResponse.data.success === true) {
+        Success("Data Asset Keluar Masuk Berhasil Diupdate");
+        fetchNewDataBarangMasuk();
+        toggle();
+      }
+    } catch (error: any) {
+      Error("Data Asset Keluar Masuk Gagal Diupdate");
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteDataBarangMasuk = async (id: any) => {
     try {
       setIsLoading(true);
       const userResponse = await axiosInstance.delete(
-        `/api/asset-keluar/${id}`,
+        `/api/asset-barang-keluar/${id}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -192,11 +298,11 @@ const AssetKeluar = () => {
       );
 
       if (userResponse.data.success === true) {
-        Success("Data Asset Keluar Berhasil Dihapus");
-        fetchDataAssetKeluar();
+        Success("Data Asset Keluar Masuk Berhasil Dihapus");
+        fetchNewDataBarangMasuk();
       }
     } catch (error: any) {
-      Error("Data Asset Keluar Gagal Dihapus");
+      Error("Data Asset Keluar Masuk Gagal Dihapus");
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
@@ -224,61 +330,15 @@ const AssetKeluar = () => {
     }
   };
 
-  const [Asset, setAsset] = useState<any>([]);
-
-  const handlePostAssetKeluar = async (data: any) => {
+  const [category, setCategory] = useState<any>([]);
+  const fetchDataCategory = async () => {
     try {
-      setIsLoading(true);
-      const formData = new FormData();
-
-      if (user.user.role === "admin") {
-        formData.append("id_asset", data.id_asset);
-      } else {
-        const dataAsset = JSON.parse(data.id_asset);
-        formData.append("id_Asset_ruang", dataAsset.id);
-        formData.append("id_asset", dataAsset.id_asset.id);
-      }
-      formData.append("kondisi", data.kondisi);
-      formData.append("jumlah", data.jumlah);
-      formData.append("penerima", data.penerima);
-      formData.append("tanggal_keluar", data.tanggal_keluar);
-      formData.append("keterangan", data.keterangan);
-
-      const userResponse = await axiosInstance.post(
-        "/api/asset-keluar",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (userResponse.data.success === true) {
-        Success("Data Asset Keluar Berhasil Ditambahkan");
-        fetchDataAssetKeluar();
-        toggle();
-      }
-    } catch (error: any) {
-      Error("Data Asset Keluar Gagal Ditambahkan");
-      if (error.response.status === 401) {
-        localStorage.removeItem("authUser");
-        naviagate("/login");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchDataAsset = async () => {
-    try {
-      const response = await axiosInstance.get("/api/asset", {
+      const response = await axiosInstance.get("/api/category", {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      setAsset(response.data.data.data);
+      setCategory(response.data.data.data);
     } catch (error: any) {
       if (error.response.status === 401) {
         localStorage.removeItem("authUser");
@@ -288,9 +348,10 @@ const AssetKeluar = () => {
   };
 
   useEffect(() => {
-    fetchDataAssetKeluar();
+    fetchDataBarangMasuk();
     fetchDataKondisi();
-    fetchDataAsset();
+    fetchDataCategory();
+    fetchNewDataBarangMasuk();
   }, []);
 
   const [loadingV, setLoadingV] = useState(false);
@@ -321,7 +382,7 @@ const AssetKeluar = () => {
 
   return (
     <Layout>
-      <BreadCrumb title="Data Asset" pageTitle="Asset" />
+      <BreadCrumb title="Data Asset Keluar" pageTitle="Barang" />
       <DeleteModal
         show={deleteModal}
         onHide={deleteToggle}
@@ -339,7 +400,7 @@ const AssetKeluar = () => {
         <div className="card-body">
           <div className="flex items-center gap-3 mb-4">
             <h6 className="text-15 grow">
-              Asset (<b className="total-Employs">{data.length}</b>)
+              Asset Keluar (<b className="total-Employs">{data.length}</b>)
             </h6>
             <div className="shrink-0">
               <Link
@@ -404,7 +465,7 @@ const AssetKeluar = () => {
           closeButtonClass="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500"
         >
           <Modal.Title className="text-16">
-            {!!isEdit ? "Edit Asset" : "Add Asset Masuk"}
+            {!!isEdit ? "Edit Barang" : "Add Asset Keluar"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
@@ -428,72 +489,74 @@ const AssetKeluar = () => {
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="id_Asset"
+                  htmlFor="kode"
                   className="inline-block mb-2 text-base font-medium"
                 >
-                  Pilih Asset
+                  Asset
                 </label>
                 <select
-                  id="id_Asset"
+                  id="kode"
                   className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  name="id_asset"
+                  name="kode"
                   onChange={(e) => {
-                    // const datas = JSON.parse(e.target.value);
                     validation.handleChange(e);
-                    validation.setFieldValue("id_asset", e.target.value);
-                    // if (user.user.role === "admin") {
-                    //   validation.setFieldValue("id_Asset", e.target.value);
-                    // } else {
-                    //   validation.setFieldValue("id_Asset", datas.id);
-                    //   validation.setFieldValue(
-                    //     "id_Asset_user",
-                    //     datas.id_Asset_masuk.id
-                    //   );
-                    // }
+                    const selectedItem = barang.find(
+                      (item: any) => item.kode === e.target.value
+                    );
+                    validation.setFieldValue("kode", selectedItem?.kode || "");
+                    validation.setFieldValue("nama", selectedItem?.nama || "");
+                    validation.setFieldValue(
+                      "category",
+                      selectedItem?.category || ""
+                    );
                   }}
                   onBlur={validation.handleBlur}
                   value={
-                    validation.values.id_asset ||
-                    (eventData && eventData.id_asset.id) ||
+                    validation.values.kode ||
+                    (isEdit && eventData && eventData.kode) ||
                     ""
                   }
                 >
                   <option value="">Pilih Asset</option>
-                  {Asset.map((item: any, index: number) => (
-                    <option
-                      key={index}
-                      value={
-                        user.user.role === "admin"
-                          ? item.id
-                          : JSON.stringify(item)
-                      }
-                    >
-                      {user.user.role === "admin"
-                        ? item.name
-                        : item.id_asset.nama}
+                  {barang.map((item: any, index: number) => (
+                    <option key={index} value={item.kode}>
+                      {item.nama}
                     </option>
                   ))}
                 </select>
-                {validation.touched.id_asset && validation.errors.id_asset ? (
-                  <p className="text-red-400">{validation.errors.id_asset}</p>
+                {validation.touched.kode && validation.errors.kode ? (
+                  <p className="text-red-400">{validation.errors.kode}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
                 <label
                   htmlFor="kondisi"
-                  className="inline-block mb-2 text-balance font-medium"
+                  className="inline-block mb-2 text-base font-medium"
                 >
                   Kondisi
                 </label>
-                <input
-                  type="text"
+                <select
                   id="kondisi"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Kondisi"
+                  className="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                   name="kondisi"
-                  onChange={validation.handleChange}
-                  value={validation.values.kondisi || ""}
-                />
+                  onChange={(e) => {
+                    validation.handleChange(e);
+                    validation.setFieldValue("kondisi", e.target.value);
+                  }}
+                  onBlur={validation.handleBlur}
+                  value={
+                    validation.values.kondisi ||
+                    (eventData && eventData.kondisi.nama) ||
+                    ""
+                  }
+                >
+                  <option value="">Pilih Kondisi</option>
+                  {kondisi.map((item: any, index: number) => (
+                    <option key={index} value={item.nama}>
+                      {item.nama}
+                    </option>
+                  ))}
+                </select>
                 {validation.touched.kondisi && validation.errors.kondisi ? (
                   <p className="text-red-400">{validation.errors.kondisi}</p>
                 ) : null}
@@ -520,26 +583,6 @@ const AssetKeluar = () => {
               </div>
               <div className="xl:col-span-12">
                 <label
-                  htmlFor="penerima"
-                  className="inline-block mb-2 text-balance font-medium"
-                >
-                  Penerima
-                </label>
-                <input
-                  type="text"
-                  id="penerima"
-                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                  placeholder="Penerima"
-                  name="penerima"
-                  onChange={validation.handleChange}
-                  value={validation.values.penerima || ""}
-                />
-                {validation.touched.penerima && validation.errors.penerima ? (
-                  <p className="text-red-400">{validation.errors.penerima}</p>
-                ) : null}
-              </div>
-              <div className="xl:col-span-12">
-                <label
                   htmlFor="tanggal_keluar"
                   className="inline-block mb-2 text-balance font-medium"
                 >
@@ -559,6 +602,26 @@ const AssetKeluar = () => {
                   <p className="text-red-400">
                     {validation.errors.tanggal_keluar}
                   </p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="penerima"
+                  className="inline-block mb-2 text-balance font-medium"
+                >
+                  Penerima
+                </label>
+                <input
+                  type="text"
+                  id="penerima"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Penerima"
+                  name="penerima"
+                  onChange={validation.handleChange}
+                  value={validation.values.penerima || ""}
+                />
+                {validation.touched.penerima && validation.errors.penerima ? (
+                  <p className="text-red-400">{validation.errors.penerima}</p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
