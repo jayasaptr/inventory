@@ -514,11 +514,13 @@ const NewBarangMasukPage = () => {
                   }
                 >
                   <option value="">Pilih Barang</option>
-                  {barang.map((item: any, index: number) => (
-                    <option key={index} value={item.id}>
-                      {item.nama}
-                    </option>
-                  ))}
+                  {barang
+                    .filter((item: any) => item.status === "approve")
+                    .map((item: any, index: number) => (
+                      <option key={index} value={item.id}>
+                        {item.nama}
+                      </option>
+                    ))}
                 </select>
                 {validation.touched.id_barang && validation.errors.id_barang ? (
                   <p className="text-red-400">{validation.errors.id_barang}</p>

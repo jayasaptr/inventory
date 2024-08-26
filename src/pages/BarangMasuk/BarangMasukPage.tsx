@@ -2,7 +2,7 @@ import BreadCrumb from "Common/BreadCrumb";
 import DeleteModal from "Common/DeleteModal";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastContainer, ToastPosition, toast } from "react-toastify";
-import { ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Check, ImagePlus, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 // Formik
 import * as Yup from "yup";
@@ -102,11 +102,28 @@ const BarangMasukPage = () => {
         enableColumnFilter: false,
       },
       {
+        header: "Status",
+        accessorKey: "status",
+        enableColumnFilter: false,
+      },
+      {
         header: "Action",
         enableColumnFilter: false,
         enableSorting: true,
         cell: (cell: any) => (
           <div className="flex gap-3">
+            {cell.row.original.status === "approve" || user.user.role !== "admin" ? null : (
+              <Link
+                to="#!"
+                className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md remove-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
+                onClick={() => {
+                  const data = cell.row.original;
+                  updateStatus(data.id);
+                }}
+              >
+                <Check className="size-4" />
+              </Link>
+            )}
             <Link
               to="#!"
               className="flex items-center justify-center size-8 transition-all duration-200 ease-linear rounded-md edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"
@@ -168,6 +185,11 @@ const BarangMasukPage = () => {
       const formData = new FormData();
       formData.append("nama", data.nama);
       formData.append("code_barang", data.code_barang);
+      if (user.user.role === "admin") {
+        formData.append("status", "approve");
+      } else {
+        formData.append("status", "pending");
+      }
 
       const userResponse = await axiosInstance.post(
         "/api/barang-masuk",
@@ -193,6 +215,33 @@ const BarangMasukPage = () => {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const updateStatus = async (id: number) => {
+    const formData = new FormData();
+    formData.append("status", "approve");
+    try {
+      const response = await axiosInstance.post(
+        `/api/barang-masuk/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      if (response.data.success === true) {
+        Success("Status Barang Berhasil Diupdate");
+        fetchDataBarangMasuk();
+      }
+    } catch (error: any) {
+      Error("Status Barang Gagal Diupdate");
+      if (error.response.status === 401) {
+        localStorage.removeItem("authUser");
+        naviagate("/login");
+      }
     }
   };
 

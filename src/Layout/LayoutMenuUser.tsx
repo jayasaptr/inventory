@@ -21,6 +21,7 @@ import {
   Trophy,
   School,
   UserRound,
+  Package,
 } from "lucide-react";
 
 const menuUser: any = [
@@ -42,28 +43,16 @@ const menuUser: any = [
       },
     ],
   },
-  // {
-  //   label: "Data Master",
-  //   isTitle: true,
-  // },
-  // {
-  //   id: "Category",
-  //   label: "Category",
-  //   icon: <Copy />,
-  //   link: "/category",
-  // },
-  // {
-  //   id: "Kondisi",
-  //   label: "Kondisi",
-  //   icon: <MonitorDot />,
-  //   link: "/kondisi",
-  // },
-  // {
-  //   id: "Ruangan",
-  //   label: "Ruangan",
-  //   icon: <School />,
-  //   link: "/ruangan",
-  // },
+  {
+    label: "Data Master",
+    isTitle: true,
+  },
+  {
+    id: "Barang",
+    label: "Barang",
+    icon: <Package />,
+    link: "/barang-masuk",
+  },
   {
     label: "Data Surat",
     isTitle: true,
