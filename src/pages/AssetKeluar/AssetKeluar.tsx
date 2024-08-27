@@ -167,7 +167,7 @@ const AssetKeluar = () => {
           Authorization: `Bearer ${user.token}`,
         },
         params: {
-          category: "asset",
+          category: "aset",
         },
       });
       console.log(
@@ -192,9 +192,9 @@ const AssetKeluar = () => {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
-        params:{
-          category: "asset"
-        }
+        params: {
+          category: "aset",
+        },
       });
       setData(userResponse.data.data.data);
     } catch (error: any) {

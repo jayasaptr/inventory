@@ -105,7 +105,7 @@ const ReportPerbaikanAsset = () => {
           start_date: startDate,
           end_date: endDate,
           status: idKondisi,
-          category: "asset",
+          category: "aset",
         },
       });
       setData(userResponse.data.data.data);

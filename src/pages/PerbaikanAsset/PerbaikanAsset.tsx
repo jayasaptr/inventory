@@ -248,7 +248,7 @@ const PerbaikanAsset = () => {
             Authorization: `Bearer ${user.token}`,
           },
           params: {
-            category: "asset",
+            category: "aset",
           },
         }
       );
@@ -371,7 +371,7 @@ const PerbaikanAsset = () => {
               Authorization: `Bearer ${user.token}`,
             },
             params: {
-              category: "asset",
+              category: "aset",
             },
           }
         );
@@ -382,7 +382,7 @@ const PerbaikanAsset = () => {
             Authorization: `Bearer ${user.token}`,
           },
           params: {
-            category: "asset",
+            category: "aset",
           },
         });
         setBarang(response.data.data.data);
