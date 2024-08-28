@@ -249,6 +249,12 @@ const menuData: any = [
     icon: <FileLineChart />,
     subItems: [
       {
+        id: "Laporan Barang / Asset",
+        label: "Barang / Asset",
+        icon: <FileLineChart />,
+        link: "/laporan-barang-asset",
+      },
+      {
         id: "Laporan Barang Masuk",
         label: "Barang Masuk",
         icon: <FileLineChart />,
