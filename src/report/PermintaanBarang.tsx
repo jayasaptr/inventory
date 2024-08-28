@@ -223,7 +223,7 @@ const ReportPermintaanBarang = () => {
       </div>
 
       <div style={{ display: "none" }}>
-        <ReportPrint ref={printRef} title="Report Barang Keluar">
+        <ReportPrint ref={printRef} title="Report Permintaan Barang">
           <TableContainer
             isPagination={false}
             isTfoot={false}
