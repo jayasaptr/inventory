@@ -144,6 +144,12 @@ const menuData: any = [
     icon: <PackagePlus />,
     subItems: [
       {
+        id: "Asset / Barang",
+        label: "Asset / Barang",
+        icon: <PackagePlus />,
+        link: "/asset-barang",
+      },
+      {
         id: "Asset Masuk",
         label: "Asset Masuk",
         icon: <PackagePlus />,
