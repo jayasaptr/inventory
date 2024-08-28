@@ -135,8 +135,8 @@ const ReportPerbaikanBarang = () => {
   return (
     <Layout>
       <BreadCrumb
-        title="Report Perbaikan Asset"
-        pageTitle="Report Perbaikan Asset"
+        title="Report Perbaikan Barang"
+        pageTitle="Report Perbaikan Barang"
       />
       <div className="card">
         <div className="card-body">
@@ -236,7 +236,7 @@ const ReportPerbaikanBarang = () => {
       </div>
 
       <div style={{ display: "none" }}>
-        <ReportPrint ref={printRef} title="Report Perbaikan Asset">
+        <ReportPrint ref={printRef} title="Report Perbaikan Barang">
           <TableContainer
             isPagination={false}
             isTfoot={false}
