@@ -308,7 +308,9 @@ const AssetBarangPage = () => {
                   value={idCategory || ""} // set default value
                 >
                   <option value="">Semua Category</option>
-                  {Array.from(new Set(data.map((item: any) => item.category))).map((category: any) => (
+                  {Array.from(
+                    new Set(data.map((item: any) => item.category))
+                  ).map((category: any) => (
                     <option key={category} value={category}>
                       {category}
                     </option>

@@ -1,3 +1,4 @@
+import { link } from "fs";
 import {
   Award,
   CalendarDays,
@@ -286,6 +287,16 @@ const menuData: any = [
       },
     ],
   },
+  // {
+  //   label: "Crud",
+  //   isTitle: true,
+  // },
+  // {
+  //   id: "crud",
+  //   label: "Siswa",
+  //   icon: <Award />,
+  //   link: "/siswa",
+  // },
 ];
 
 export { menuData };

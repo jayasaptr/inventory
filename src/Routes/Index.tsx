@@ -33,6 +33,7 @@ import AssetKeluar from "pages/AssetKeluar/AssetKeluar";
 import NewBarangMasukPage from "pages/AssetBarang/NewBarangMasukPage";
 import NewAssetMasukPage from "pages/AssetBarang/NewAssetMasukPage";
 import ReportPerbaikanBarang from "report/ReportPerbaikanBarang";
+import SiswaPage from "pages/Siswa/SiswaPage";
 
 const RouteIndex = () => {
   return (
@@ -97,6 +98,7 @@ const RouteIndex = () => {
           path="/report-perbaikan-kabag"
           Component={ReportPengajuanPerbaikan}
         />
+        <Route path="/siswa" Component={SiswaPage} />
       </Routes>
     </React.Fragment>
   );
