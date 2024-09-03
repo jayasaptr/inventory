@@ -47,7 +47,15 @@ const ReportPrint = forwardRef<HTMLDivElement, ReportPrintProps>(
                 })}
               </p>
               <p>Kepala Madrasah,</p>
-              <p className="mt-16 font-bold">HANIFAH, S.Pd.I</p>
+
+              <div className="mt-2">
+                <img
+                  src="/images/ttd_stempel.png"
+                  alt="Stamp and Signature"
+                  className="mx-auto h-32"
+                />
+              </div>
+              <p className="mt-4 font-bold">HANIFAH, S.Pd.I</p>
             </div>
           </div>
         </div>

@@ -535,7 +535,7 @@ const SuratKeteranganAktif = () => {
             </h1>
             <p className="text-center">
               {`w.o/6/PP.03.2/${
-                validation.values.nomor_surat
+                validation.values.no_surat
               }/${new Date().getFullYear()}`}
             </p>
             <div className="mt-8">
