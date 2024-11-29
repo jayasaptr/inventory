@@ -237,10 +237,13 @@ const BarangKeluarPage = () => {
         toggle();
       }
     } catch (error: any) {
-      Error("Data Barang Keluar Masuk Gagal Ditambahkan");
-      if (error.response.status === 401) {
+      if (error.response.status === 400) {
+        Error(error.response.data.message);
+      } else if (error.response.status === 401) {
         localStorage.removeItem("authUser");
         naviagate("/login");
+      } else {
+        Error("Data Barang Keluar Masuk Gagal Ditambahkan");
       }
     } finally {
       setIsLoading(false);

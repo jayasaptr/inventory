@@ -320,16 +320,18 @@ const AssetBarangPage = () => {
             </div>
           </div>
           {data && data.length > 0 ? (
-            // for no get from 1 index
-            (data.map((item: any, index: number) => {
-              item.no = index + 1;
-              return item;
-            }),
+            // Filter out items with jumlah 0 and map the remaining items
+            (data
+              .filter((item: any) => item.jumlah > 0)
+              .map((item: any, index: number) => {
+                item.no = index + 1;
+                return item;
+              }),
             (
               <TableContainer
                 isPagination={true}
                 columns={columns || []}
-                data={data || []}
+                data={data.filter((item: any) => item.jumlah > 0) || []}
                 customPageSize={5}
                 divclassName="-mx-5 overflow-x-auto"
                 tableclassName="w-full whitespace-nowrap"

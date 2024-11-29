@@ -201,14 +201,16 @@ const LaporanAssetBarang = () => {
               isGlobalFilter={false}
               columns={columns || []}
               data={
-                data.map((item: any) => {
-                  return {
-                    ...item,
-                    jumlah: item.jumlah,
-                    harga: item.harga,
-                    total_harga: item.jumlah * item.harga,
-                  };
-                }) || []
+                data
+                  .filter((item: any) => item.jumlah > 0)
+                  .map((item: any) => {
+                    return {
+                      ...item,
+                      jumlah: item.jumlah,
+                      harga: item.harga,
+                      total_harga: item.jumlah * item.harga,
+                    };
+                  }) || []
               }
               customPageSize={10}
               divclassName="my-2 col-span-12 overflow-x-auto lg:col-span-12"

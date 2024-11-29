@@ -70,6 +70,7 @@ const SuratTugas = () => {
       user_id: (eventData && eventData.user_id) || "",
       keterangan: (eventData && eventData.keterangan) || "",
       jabatan: (eventData && eventData.jabatan) || "",
+      biaya_akomodasi: (eventData && eventData.biaya_akomodasi) || "",
     },
     validationSchema: Yup.object({
       nomor_surat: Yup.string().required("No Surat is Required"),
@@ -78,6 +79,7 @@ const SuratTugas = () => {
       user_id: Yup.string().required("User is Required"),
       keterangan: Yup.string().required("Keterangan is Required"),
       jabatan: Yup.string().required("Jabatan is Required"),
+      biaya_akomodasi: Yup.string().required("Biaya is Required"),
     }),
 
     onSubmit: (values) => {
@@ -134,6 +136,11 @@ const SuratTugas = () => {
       {
         header: "Pegawai",
         accessorKey: "user_id.name",
+        enableColumnFilter: false,
+      },
+      {
+        header: "Biaya",
+        accessorKey: "biaya_akomodasi",
         enableColumnFilter: false,
       },
       {
@@ -280,6 +287,7 @@ const SuratTugas = () => {
       formData.append("user_id", data.user_id);
       formData.append("keterangan", data.keterangan);
       formData.append("jabatan", data.jabatan);
+      formData.append("biaya_akomodasi", data.biaya_akomodasi);
 
       const userResponse = await axiosInstance.post(
         "/api/surat-tugas",
@@ -318,6 +326,7 @@ const SuratTugas = () => {
       formData.append("user_id", data.user_id);
       formData.append("keterangan", data.keterangan);
       formData.append("jabatan", data.jabatan);
+      formData.append("biaya_akomodasi", data.biaya_akomodasi);
 
       const userResponse = await axiosInstance.post(
         `/api/surat-tugas/${data.id}`,
@@ -688,6 +697,29 @@ const SuratTugas = () => {
                 />
                 {validation.touched.jabatan && validation.errors.jabatan ? (
                   <p className="text-red-400">{validation.errors.jabatan}</p>
+                ) : null}
+              </div>
+              <div className="xl:col-span-12">
+                <label
+                  htmlFor="biaya_akomodasi"
+                  className="inline-block mb-2 text-base font-medium"
+                >
+                  Biaya
+                </label>
+                <input
+                  type="text"
+                  id="biaya_akomodasi"
+                  className="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                  placeholder="Biaya"
+                  name="biaya_akomodasi"
+                  onChange={validation.handleChange}
+                  value={validation.values.biaya_akomodasi || ""}
+                />
+                {validation.touched.biaya_akomodasi &&
+                validation.errors.biaya_akomodasi ? (
+                  <p className="text-red-400">
+                    {validation.errors.biaya_akomodasi}
+                  </p>
                 ) : null}
               </div>
               <div className="xl:col-span-12">
